@@ -49,7 +49,7 @@ compiler.elf2hex.extra_flags=
 
 
 compiler.lib.c.flags= -D__NUVOTON__ "-I{build.system.path}/{build.def}/CMSIS/Include/" "-I{build.system.path}/{build.def}/Device/Nuvoton/{build.def}/Include/" "-I{build.system.path}/{build.def}/StdDriver/inc/" "-I{build.system.path}/../libraries/ArduinoBLE/src/NuvotonBLE/Porting" "-I{build.system.path}/../libraries/ArduinoBLE/src/NuvotonBLE/Include"
-compiler.libraries.ldflags= {build.system.path}/../libraries/ArduinoBLE/src/NuvotonBLE/Lib/lib_Link_Layer.a
+#compiler.libraries.ldflags= {build.system.path}/../libraries/ArduinoBLE/src/NuvotonBLE/Lib/lib_Link_Layer.a
 
 # USB Flags
 # ---------
