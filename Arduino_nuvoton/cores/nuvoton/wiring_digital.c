@@ -52,78 +52,13 @@ extern void pinMode(uint32_t ulPin, uint32_t ulMode)
         break;
     }
 #elif defined(__M032BT__)|| defined(__M032KG__)
-    switch (ulMode)
-    {
-    case INPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_MODE_INPUT);
-        break;
 
-    case INPUT_PULLUP:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_MODE_QUASI);
-        break;
-
-    case OUTPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_MODE_OUTPUT);
-        break;
-
-    default:
-        break;
-    }
 #elif defined(__NUC240__)
-    switch (ulMode)
-    {
-    case INPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_INPUT);
-        break;
 
-    case INPUT_PULLUP:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_QUASI);
-        break;
-
-    case OUTPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_OUTPUT);
-        break;
-
-    default:
-        break;
-    }
 #elif defined(__NANO100__) || defined(__NANO1X2__)
-    switch (ulMode)
-    {
-    case INPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_INPUT);
-        break;
 
-    case INPUT_PULLUP:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_INPUT);
-        (GPIO_Desc[ulPin].P)->PUEN |= GPIO_Desc[ulPin].bit;
-        break;
-
-    case OUTPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_OUTPUT);
-        break;
-
-    default:
-        break;
-    }
 #elif defined(__NUC131__)
-    switch (ulMode)
-    {
-    case INPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_INPUT);
-        break;
 
-    case INPUT_PULLUP:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_QUASI);
-        break;
-
-    case OUTPUT:
-        GPIO_SetMode(GPIO_Desc[ulPin].P, GPIO_Desc[ulPin].bit, GPIO_PMD_OUTPUT);
-        break;
-
-    default:
-        break;
-    }
 #endif
 }
 

@@ -66,8 +66,7 @@ uint32_t analogRead(uint32_t ulPin)
 	EADC_Open(ADC_Desc[ulPin].A, 0);
 	EADC_SetExtendSampleTime(EADC, ADC_Desc[ulPin].ch, 6);
 #else
-	EADC_Open(ADC_Desc[ulPin].A, EADC_CTL_DIFFEN_SINGLE_END);
-	EADC_SetInternalSampleTime(EADC, 6);
+
 #endif
 	
 	/* Configure the sample 0 module for analog input channel 0 and enable ADINT0 trigger source */
@@ -99,151 +98,15 @@ uint32_t analogRead(uint32_t ulPin)
   EADC_Close(ADC_Desc[ulPin].A);
 
 #elif defined(__NUC240__)
-  uint32_t ulValue = 0;  
 
-  if(ulPin>ADC_MAX_COUNT || ADC_Desc[ulPin].A==NULL) return;  	  
-  	
-  ADC_Config(ADC_Desc[ulPin]);
-  
-  //GPIO_ENABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num].bit);
-  
-  // Enable channel 0
-	ADC_Open(ADC_Desc[ulPin].A, 0, 0, (1<<ADC_Desc[ulPin].ch));
-		
-	// Power on ADC
-	ADC_POWER_ON(ADC_Desc[ulPin].A);
-
-  // Wait for busy of conversion
-  while(ADC_IS_BUSY(ADC_Desc[ulPin].A));	
-  	
-  // Start for conversion	
-  ADC_START_CONV(ADC_Desc[ulPin].A);
-  		
-	// Wait for end of conversion
-	while(!ADC_GET_INT_FLAG(ADC_Desc[ulPin].A,ADC_ADF_INT));
-	
-	// Clear ADC flag
-	ADC_CLR_INT_FLAG(ADC_Desc[ulPin].A,ADC_ADF_INT);
-	
-	// Read the value
-	ulValue = ADC_GET_CONVERSION_DATA(ADC_Desc[ulPin].A,ADC_Desc[ulPin].ch);	
-	ulValue = mapResolution(ulValue, 12, _readResolution);
-  
-  //GPIO_DISABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin-1].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num-1].bit);
-  
-  // Close ADC
-  ADC_Close(ADC_Desc[ulPin].A);
 
 #elif defined(__NANO100__) || defined(__NANO1X2__)
-  uint32_t ulValue = 0;  
 
-  if(ulPin>ADC_MAX_COUNT || ADC_Desc[ulPin].A==NULL) return;  	  
-  	
-  ADC_Config(ADC_Desc[ulPin]);
-  
-  //GPIO_ENABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num].bit);
-  
-  // Enable channel 
-	ADC_Open(ADC_Desc[ulPin].A, ADC_INPUT_MODE_SINGLE_END, ADC_OPERATION_MODE_SINGLE, (1<<ADC_Desc[ulPin].ch));
-	
-	// Power on ADC
-	ADC_POWER_ON(ADC_Desc[ulPin].A);
-
-  // Wait for busy of conversion
-  while(ADC_IS_BUSY(ADC_Desc[ulPin].A));	
-  	
-  // Start for conversion	
-  ADC_START_CONV(ADC_Desc[ulPin].A);
-  		
-	// Wait for end of conversion
-	while(!ADC_GET_INT_FLAG(ADC_Desc[ulPin].A,ADC_ADF_INT));
-	
-	// Clear ADC flag
-	ADC_CLR_INT_FLAG(ADC_Desc[ulPin].A,ADC_ADF_INT);
-	
-	// Read the value
-	ulValue = ADC_GET_CONVERSION_DATA(ADC_Desc[ulPin].A,ADC_Desc[ulPin].ch);	
-	ulValue = mapResolution(ulValue, 12, _readResolution);
-  
-  //GPIO_DISABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin-1].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num-1].bit);
-  
-  // Close ADC
-  ADC_Close(ADC_Desc[ulPin].A);
 
 #elif defined(__NUC131__)
-  uint32_t ulValue = 0;  
-
-  if(ulPin>ADC_MAX_COUNT || ADC_Desc[ulPin].A==NULL) return;  	  
-  	
-  ADC_Config(ADC_Desc[ulPin]);
-  
-  //GPIO_ENABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num].bit);
-  
-  // Enable channel 0
-	ADC_Open(ADC_Desc[ulPin].A, 0, 0, (1<<ADC_Desc[ulPin].ch));
-		
-	// Power on ADC
-	ADC_POWER_ON(ADC_Desc[ulPin].A);
-
-  // Wait for busy of conversion
-  while(ADC_IS_BUSY(ADC_Desc[ulPin].A));	
-  	
-  // Start for conversion	
-  ADC_START_CONV(ADC_Desc[ulPin].A);
-  		
-	// Wait for end of conversion
-	while(!ADC_GET_INT_FLAG(ADC_Desc[ulPin].A,ADC_ADF_INT));
-	
-	// Clear ADC flag
-	ADC_CLR_INT_FLAG(ADC_Desc[ulPin].A,ADC_ADF_INT);
-	
-	// Read the value
-	ulValue = ADC_GET_CONVERSION_DATA(ADC_Desc[ulPin].A,ADC_Desc[ulPin].ch);	
-	ulValue = mapResolution(ulValue, 12, _readResolution);
-  
-  //GPIO_DISABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin-1].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num-1].bit);
-  
-  // Close ADC
-  ADC_Close(ADC_Desc[ulPin].A);
 
 #elif defined(__M032BT__)|| defined(__M032KG__)
-	uint32_t ulValue = 0;
-	
-	if ((ulPin >= ADC_MAX_COUNT) || (ADC_Desc[ulPin].A == NULL))
-	{
-		 return 0;
-	}
-	
-	ADC_Config(ADC_Desc[ulPin]);
 
-	//GPIO_ENABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num].bit);
-	// Power on ADC
-	ADC_POWER_ON(ADC_Desc[ulPin].A);
-
-	/* Set input mode as single-end, Single mode, and select channel 2 */
-	ADC_Open(ADC_Desc[ulPin].A, ADC_ADCR_DIFFEN_SINGLE_END, ADC_ADCR_ADMD_SINGLE, (1 << ADC_Desc[ulPin].ch));
-	
-	/* Clear the A/D interrupt flag for safe */
-	ADC_CLR_INT_FLAG(ADC, ADC_ADF_INT);
-	// Wait for busy of conversion
-	while (ADC_IS_BUSY(ADC_Desc[ulPin].A));
-	// Start for conversion	
-	ADC_START_CONV(ADC_Desc[ulPin].A);
-
-	// Wait for end of conversion
-	while (!ADC_GET_INT_FLAG(ADC_Desc[ulPin].A, ADC_ADF_INT));
-
-	// Clear ADC flag
-	ADC_CLR_INT_FLAG(ADC_Desc[ulPin].A, ADC_ADF_INT);
-
-	// Read the value
-	ulValue = ADC_GET_CONVERSION_DATA(ADC_Desc[ulPin].A, ADC_Desc[ulPin].ch);
-	ulValue = mapResolution(ulValue, 12, _readResolution);
-
-	//GPIO_DISABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin-1].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num-1].bit);
-
-	// Close ADC
-	ADC_Close(ADC_Desc[ulPin].A);
 #endif
   return ulValue;	
 }
@@ -268,27 +131,9 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	
 	ulValue=((ulValue+1)*100)/(1<<_writeResolution);
 #if defined(__M451__)
-	if(ulValue==100)
-	{  
-		int32_t pin=PWM_Desc[ulPin].pintype.num;
-		GPIO_Config(GPIO_Desc[pin]);
-		GPIO_SetMode(GPIO_Desc[pin].P, GPIO_Desc[pin].bit, GPIO_MODE_OUTPUT);
-		(GPIO_Desc[pin].P)->DOUT |= GPIO_Desc[pin].bit;
-		pinEnabled[ulPin]= 0;
-		fixValue[ulPin]=ulValue;
-		return;
-	}
+
 #elif defined(__M252__)
-	if(ulValue==0)
-	{  
-		int32_t pin=PWM_Desc[ulPin].pintype.num;
-		GPIO_Config(GPIO_Desc[pin]);
-		GPIO_SetMode(GPIO_Desc[pin].P, GPIO_Desc[pin].bit, GPIO_MODE_OUTPUT);
-		(GPIO_Desc[pin].P)->DOUT &= ~GPIO_Desc[pin].bit;
-		pinEnabled[ulPin]= 0;
-		fixValue[ulPin]=ulValue;
-		return;
-	}	
+
 #elif defined(__M480__)|| defined(__M460__)
 	if(ulValue==0)
 	{  
@@ -301,94 +146,17 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		return;
 	}
 #elif defined(__NUC240__)
-	if(ulValue==0)
-	{  
-		int32_t pin=PWM_Desc[ulPin].pintype.num;
-		GPIO_Config(GPIO_Desc[pin]);
-		GPIO_SetMode(GPIO_Desc[pin].P, GPIO_Desc[pin].bit, GPIO_PMD_OUTPUT);
-		(GPIO_Desc[pin].P)->DOUT &= ~GPIO_Desc[pin].bit;
-		pinEnabled[ulPin]= 0;
-		fixValue[ulPin]=ulValue;
-		return;
-	}
+
 #elif defined(__NANO100__) || defined(__NANO1X2__)
-	if(ulValue==0)
-	{  
-		int32_t pin=PWM_Desc[ulPin].pintype.num;
-		GPIO_Config(GPIO_Desc[pin]);
-		GPIO_SetMode(GPIO_Desc[pin].P, GPIO_Desc[pin].bit, GPIO_PMD_OUTPUT);
-		(GPIO_Desc[pin].P)->DOUT &= ~GPIO_Desc[pin].bit;
-		pinEnabled[ulPin]= 0;
-		fixValue[ulPin]=ulValue;
-		return;
-	}
+
 #elif defined(__NUC131__)
-	if(ulValue==0)
-	{  
-		int32_t pin=PWM_Desc[ulPin].pintype.num;
-		GPIO_Config(GPIO_Desc[pin]);
-		GPIO_SetMode(GPIO_Desc[pin].P, GPIO_Desc[pin].bit, GPIO_PMD_OUTPUT);
-		(GPIO_Desc[pin].P)->DOUT &= ~GPIO_Desc[pin].bit;
-		pinEnabled[ulPin]= 0;
-		fixValue[ulPin]=ulValue;
-		return;
-	}
+
 #elif defined(__M032BT__)
-	if(ulValue==0)
-	{  
-		int32_t pin=PWM_Desc[ulPin].pintype.num;
-		GPIO_Config(GPIO_Desc[pin]);
-		GPIO_SetMode(GPIO_Desc[pin].P, GPIO_Desc[pin].bit, GPIO_MODE_OUTPUT);
-		(GPIO_Desc[pin].P)->DOUT &= ~GPIO_Desc[pin].bit;
-		pinEnabled[ulPin]= 0;
-		fixValue[ulPin]=ulValue;
-		return;
-	}
+
 #endif	
 
 #if defined(__M032BT__)
 
-	/**** Combine Structure BPWM and PWM ****/
-	typedef uint32_t (*pwmConfigChannel)(void *pwm, uint32_t , uint32_t , uint32_t);
-	typedef uint32_t (*pwmEnableOutput)(void *pwm, uint32_t u32ChannelMask);
-	typedef uint32_t (*pwmStart)(void *pwm, uint32_t u32ChannelMask);
-	pwmConfigChannel pfn_pwmConfigChannel;
-	pwmEnableOutput	pfn_pwmEnableOutput;
-	pwmStart	pfn_pwmStart;
-
-	if((PWM_Desc[ulPin].V==BPWM0)||(PWM_Desc[ulPin].V==BPWM1)){
-		pfn_pwmConfigChannel	= (pwmConfigChannel)BPWM_ConfigOutputChannel;
-		pfn_pwmEnableOutput		= (pwmEnableOutput)BPWM_EnableOutput;
-		pfn_pwmStart			= (pwmStart)BPWM_Start;
-	}else{ 
-		pfn_pwmConfigChannel	= (pwmConfigChannel)PWM_ConfigOutputChannel;
-		pfn_pwmEnableOutput		= (pwmEnableOutput)PWM_EnableOutput;
-		pfn_pwmStart			= (pwmStart)PWM_Start;
-	}
-	/************************************/
-
-	if (!pinEnabled[ulPin]){
-		//Set Mutifunction pins
-		PWM_Config(PWM_Desc[ulPin]);		
-
-		//Config PWMs
-		pfn_pwmConfigChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
-		
-		//Enable PWM output
-		pfn_pwmEnableOutput(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));
-		
-		//Start PWM
-		pfn_pwmStart(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));
-		
-		pinEnabled[ulPin] = 1;
-	}
-	
-	//Config PWMs		
-	if(fixValue[ulPin]!=ulValue)
-	{
-		pfn_pwmConfigChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
-		fixValue[ulPin]=ulValue;
-	}
 
 #else
 	if (!pinEnabled[ulPin]){
@@ -406,14 +174,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		//Start PWM
 		EPWM_Start(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));  
 #else
-		//Config PWMs
-		PWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
 		
-		//Enable PWM output
-		PWM_EnableOutput(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));
-		
-		//Start PWM
-		PWM_Start(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));
 #endif		
 		pinEnabled[ulPin] = 1;
 	}
@@ -424,7 +185,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 #if defined(__M480__)|| defined(__M460__)		
 		EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
 #else
-        PWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
+        
 #endif
 		fixValue[ulPin]=ulValue;
 	}
