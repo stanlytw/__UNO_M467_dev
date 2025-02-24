@@ -8,23 +8,18 @@
             "name":"nuvoton",
             "platforms": [
                 {
-                  "name": "NuMaker UNO",
+                  "name": "UNO M467",
                   "architecture": "nuvoton",
-                  "version": "3.1.8",
+                  "version": "13.1.9",
 
                   "category": "Arduino",
-                  "url": "https://github.com/stanlytw/NuMaker_UNO/blob/master/Arduino_nuvoton.tar.bz2?raw=true",
+                  "url": "https://github.com/stanlytw/__UNO_M467_dev/blob/master/Arduino_nuvoton.tar.bz2?raw=true",
                   "archiveFileName": "Arduino_nuvoton.tar.bz2",
-                  "checksum": "SHA-256:287bc24047a2eb665907dfbbb4ae5f715b5da2bacd52e0e3d144615818617934",
-                  "size": "52992234",
+                  "checksum": "SHA-256:3991480c26b89103fa16f41ad63df7ebb37670a8f298d26fc4b5bc99a78c99af",
+                  "size": "32140412",
                   "boards": [
-                    {"name": "NuMaker-NUC131"},
-                    {"name": "NuMaker-M032BTAI"},
-                    {"name": "NuMaker-M032KG"},
-                    {"name": "NuMaker-M252"},
                     {"name": "NuMaker-M467HJ"},
-                    {"name": "NuMaker-PFM-M487"},
-		            {"name": "Customized-M467M"}
+                    {"name": "Customized-M467M"}
                     						
                   ],
                   "toolsDependencies": [
