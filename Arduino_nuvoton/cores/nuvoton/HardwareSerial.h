@@ -49,12 +49,7 @@
 #ifdef __cplusplus
 //extern "C" {
 #endif
-//struct ring_buffer
-//{
-//  unsigned char buffer[SERIAL_BUFFER_SIZE];
-//  volatile unsigned int head;
-//  volatile unsigned int tail;
-//};
+
 typedef struct
 {
   unsigned char buffer[SERIAL_BUFFER_SIZE];
@@ -81,9 +76,11 @@ public:
                    uint32_t u32ClkSrc,
                    uint32_t u32ClkDiv,
                    IRQn_Type u32IrqId,
+				   uint32_t u32ModuleNum,
                    ring_buffer *rx_buffer);
 #if defined(__M460MINIMA__)	
-    HardwareSerial(VCOM_T *vcom_device, ring_buffer *rx_buffer);
+    //HardwareSerial(VCOM_T *vcom_device, ring_buffer *rx_buffer);
+	HardwareSerial(VCOM_T *vcom_device, uint32_t u32ModuleNum, ring_buffer *rx_buffer);//[2025-02-24]Add Idx to tell the module in use for this instantiation.
 #endif
     /* Set up/tear down */
     void begin(uint32_t baud);
@@ -111,6 +108,7 @@ private:
 #endif	
     uint32_t vcom_init_done;
     uint32_t use_vcom;
+	uint32_t u32ModuleNum;
 };
 
 #if(UART_MAX_COUNT>0)

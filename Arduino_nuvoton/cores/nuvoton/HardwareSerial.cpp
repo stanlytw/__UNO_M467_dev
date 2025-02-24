@@ -36,12 +36,7 @@
 #include <inttypes.h>
 #include "Arduino.h"
 #include "HardwareSerial.h"
-#if defined(__M451__)
-
-
-#elif defined(__NUC240__)
-
-#elif defined(__M252__) || defined(__M480__) || defined(__M460__)
+#if defined(__M460__)
 #if defined(__M460MINIMA__)
     #define RXBUFSIZE           512 /* RX buffer size */
     #define TXBUFSIZE           512 /* TX buffer size */
@@ -66,28 +61,15 @@
 #if defined(__M460MINIMA__)//VCOM, UART0, UART1
     #if(UART_MAX_COUNT>0)
     ring_buffer rx_buffer= { { 0 }, 0, 0};
-    HardwareSerial Serial(HSUSBD, &rx_buffer);//VCOM
+    HardwareSerial Serial(HSUSBD, UART_Desc[UART_DESC_IDX0].modulenum, &rx_buffer);//VCOM
     #endif
 	#if(UART_MAX_COUNT>1)
     ring_buffer rx_buffer1 = { { 0 }, 0, 0};
-    HardwareSerial Serial1(UART_Desc[0].U, 0, UART_Desc[0].clksrcsel, 1, UART_Desc[0].irq, &rx_buffer1);//UART0
+    HardwareSerial Serial1(UART_Desc[1].U, UART_DESC_IDX1 , UART_Desc[1].clksrcsel, UART_Desc[1].clkdiv, UART_Desc[1].irq, UART_Desc[1].modulenum, &rx_buffer1);//UART0
     #endif
 	#if(UART_MAX_COUNT>2)
     ring_buffer rx_buffer2 = { { 0 }, 0, 0};
-    HardwareSerial Serial2(UART_Desc[1].U, 1, UART_Desc[1].clksrcsel, 1, UART_Desc[1].irq, &rx_buffer2);//UART1
-    #endif
-#else//UART0, UART1, UART4(dummy)
-    #if(UART_MAX_COUNT>0)
-    ring_buffer rx_buffer = { { 0 }, 0, 0};
-    HardwareSerial Serial(UART_Desc[0].U, 0, UART_Desc[0].clksrcsel, 1, UART_Desc[0].irq, &rx_buffer);//UART0
-    #endif
-	#if(UART_MAX_COUNT>1)
-    ring_buffer rx_buffer1 = { { 0 }, 0, 0};
-    HardwareSerial Serial1(UART_Desc[1].U, 1, UART_Desc[1].clksrcsel, 1, UART_Desc[1].irq, &rx_buffer1);//UART1
-    #endif
-	#if(UART_MAX_COUNT>2)
-    ring_buffer rx_buffer2 = { { 0 }, 0, 0};
-    HardwareSerial Serial2(UART_Desc[2].U, 4, UART_Desc[2].clksrcsel, 1, UART_Desc[2].irq, &rx_buffer2);//UART4,dummy
+    HardwareSerial Serial2(UART_Desc[2].U, UART_DESC_IDX2, UART_Desc[2].clksrcsel, UART_Desc[2].clkdiv, UART_Desc[2].irq, UART_Desc[2].modulenum, &rx_buffer2);//UART1
     #endif
 #endif
 
@@ -125,75 +107,16 @@ void UART1_IRQHandler(void)
     }
 
 }
-
 #endif
-
  
 #else//defined(__M460MINIMA__), UART0, UART1, UART4(dummy)
-#if(UART_MAX_COUNT>0)
-void UART0_IRQHandler(void)
-{
-    while (UART_GET_INT_FLAG(UART0, UART_INTEN_RDAIEN_Msk))
-    {
-        int i = (unsigned int)(rx_buffer.head + 1) % SERIAL_BUFFER_SIZE;
-        if (i != rx_buffer.tail)
-        {
-            rx_buffer.buffer[rx_buffer.head] = UART0->DAT;
-            rx_buffer.head = i;
-        }
-    }
 
-}
-#endif
 
-#if(UART_MAX_COUNT>1)
-void UART1_IRQHandler(void)
-{
-    while (UART_GET_INT_FLAG(UART1, UART_INTEN_RDAIEN_Msk))
-    {
-        int i = (unsigned int)(rx_buffer1.head + 1) % SERIAL_BUFFER_SIZE;
-        if (i != rx_buffer1.tail)
-        {
-            rx_buffer1.buffer[rx_buffer1.head] = UART1->DAT;
-            rx_buffer1.head = i;
-        }
-    }
-
-}
-#endif
-
-#if(UART_MAX_COUNT>2)
-/*UART4 is not work on M467SJ, dummy so far.*/
-void UART4_IRQHandler(void)
-{
-    while (UART_GET_INT_FLAG(UART4, UART_INTEN_RDAIEN_Msk))
-    {
-        int i = (unsigned int)(rx_buffer2.head + 1) % SERIAL_BUFFER_SIZE;
-        if (i != rx_buffer2.tail)
-        {
-            rx_buffer2.buffer[rx_buffer2.head] = UART4->DAT;
-            rx_buffer2.head = i;
-        }
-    }
-
-}
-#endif
-
-#endif
+#endif//defined(__M460MINIMA__)
 
 #ifdef __cplusplus
 }
 #endif
-
-#elif defined(__NANO100__)
-
-#elif defined(__NUC131__)
-
-#elif defined(__M032BT__)
-
-#elif defined(__M032KG__)
-
-#elif defined(__NANO1X2__)
 
 #endif
 
@@ -221,6 +144,7 @@ HardwareSerial::HardwareSerial(UART_T *uart_device,
                                uint32_t u32ClkSrc,
                                uint32_t u32ClkDiv,
                                IRQn_Type u32IrqId,
+							   uint32_t u32ModuleNum,
                                ring_buffer *rx_buffer)
 {
     this->use_vcom = 0;
@@ -229,15 +153,17 @@ HardwareSerial::HardwareSerial(UART_T *uart_device,
     this->u32ClkSrc = u32ClkSrc;
     this->u32ClkDiv = u32ClkDiv;
     this->u32IrqId = u32IrqId;
+	this->u32ModuleNum = u32ModuleNum;
     this->_rx_buffer = rx_buffer;
     
 }
 
 #if defined(__M460MINIMA__)
-HardwareSerial::HardwareSerial(VCOM_T *vcom_device,ring_buffer *rx_buffer)
+HardwareSerial::HardwareSerial(VCOM_T *vcom_device, uint32_t u32ModuleNum, ring_buffer *rx_buffer)
 {
     this->use_vcom = 1;
     this->vcom_device = vcom_device;
+	this->u32ModuleNum = u32ModuleNum;
     this->_rx_buffer = rx_buffer;
     this->vcom_init_done = 0;
 }
@@ -247,64 +173,52 @@ HardwareSerial::HardwareSerial(VCOM_T *vcom_device,ring_buffer *rx_buffer)
  */
 void HardwareSerial::begin(uint32_t baud)
 {
-#if defined(__M460MINIMA__)
-    if( use_vcom == 1)//Vcom object
-    {
-        if( vcom_init_done == 0 ) 
-        {
-            VcomBegin(baud);
-            vcom_init_done = 1;//not use vcom
-        }
-    }
-	else//UART object
+
+	if(u32ModuleNum == UART_USE_VCOM)
 	{
-		UART_Config(UART_Desc[u32Idx]);
-        SYS_UnlockReg();
-		 /* Enable IP clock */
-        CLK_EnableModuleClock(UART_Desc[u32Idx].module);
-
-        /* Select IP clock source and clock divider */
-        if(uart_device == UART0)
-            CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV0_UART0(u32ClkDiv));
-        else if(uart_device == UART1)
-            CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV0_UART1(u32ClkDiv));
-	    else if(uart_device == UART3)
-            CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART3(u32ClkDiv));
-	    else if(uart_device == UART4)
-        CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART4(u32ClkDiv));
-        
-		/* Reset IP */
-        //SYS_ResetModule(UART_Desc[u32Idx].module);
-
-        /* Enable Interrupt */
-        UART_ENABLE_INT(uart_device, UART_INTEN_RDAIEN_Msk);
-        NVIC_EnableIRQ(u32IrqId);
-
-        /* Configure UART and set UART Baudrate */
-        UART_Open(uart_device, baud);
+	   if( use_vcom == 1)//Vcom object
+       {
+           if( vcom_init_done == 0 ) 
+           {
+                VcomBegin(baud);
+                vcom_init_done = 1;//
+           }
+       }
+       return;	   
+	}
+    else if(u32ModuleNum == UART_USE_NOUSE)
+	{
+		return;
+	}
+	else
+	{
+		//u32ModuleNum = UART_USE_UART0, UART_USE_UART1... etc
+       UART_Config(UART_Desc[u32Idx]);
+       SYS_UnlockReg();		
 	}
 	
-#else//NOT  defined(__M460MINIMA__)
-    UART_Config(UART_Desc[u32Idx]);
-    SYS_UnlockReg();
-#if defined(__M451__)
-
-
-#elif defined(__M252__) || defined(__M480__) || defined(__M460__)
+#if defined(__M460__)
 
 	/* Enable IP clock */
     CLK_EnableModuleClock(UART_Desc[u32Idx].module);
 
     /* Select IP clock source and clock divider */
     if(uart_device == UART0)
-        CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV0_UART0(u32ClkDiv));
+	{
+		CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV0_UART0(u32ClkDiv));
+	}
     else if(uart_device == UART1)
-        CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV0_UART1(u32ClkDiv));
+	{
+		CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV0_UART1(u32ClkDiv));
+	}
 	else if(uart_device == UART3)
+	{	
         CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART3(u32ClkDiv));
+	}
 	else if(uart_device == UART4)
-        CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART4(u32ClkDiv));
-        
+	{	
+        //CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART4(u32ClkDiv));
+	}   
 	/* Reset IP */
     //SYS_ResetModule(UART_Desc[u32Idx].module);
 
@@ -314,31 +228,28 @@ void HardwareSerial::begin(uint32_t baud)
 
     /* Configure UART and set UART Baudrate */
     UART_Open(uart_device, baud);
-		
-#elif defined(__M032BT__)|| defined(__M032KG__)
-
-#elif defined(__NUC240__) || defined(__NUC131__)
-
-#elif defined(__NANO100__) || defined(__NANO1X2__)
 
 #endif//#if defined(__M451__)
     SYS_LockReg();
-#endif//#if defined(__M460MINIMA__)
+
 }
 
 void HardwareSerial::end(void)
 {
-#if defined(__M460MINIMA__)
-    if( use_vcom == 1)
+    if(u32ModuleNum == UART_USE_VCOM)
     {
-    /*Do nothing*/
-
-    }
-#else    
-    UART_Close(uart_device);
-#endif    
-}
-
+		return;
+	}
+    else if(u32ModuleNum == UART_USE_NOUSE)
+	{
+		return;
+	}
+	else
+	{
+		//u32ModuleNum = UART_USE_UART0, UART_USE_UART1... etc
+        UART_Close(uart_device);
+	}	
+}	
 /*
  * I/O
  */
@@ -354,52 +265,48 @@ int HardwareSerial::read(void)
     {
         unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
         _rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % SERIAL_BUFFER_SIZE;
-#if defined(__M460MINIMA__)    
-        gu32RxCount--;
-#endif        
-        return c;
+        if(u32ModuleNum == UART_USE_VCOM)
+        {
+            gu32RxCount--;
+	    }
+		
+		return c;
     }
 }
 
 int HardwareSerial::availableForWrite(void)
 {
-    /* For NUC131 */
-#if defined(__NUC131__)
-    if (UART_IS_TX_FULL(uart_device))
+    /* For M460 */
+#if defined(__M460__)
+    if(u32ModuleNum == UART_USE_VCOM)
     {
-        return 0;
-    }
-    else
-    {
-        return (UART0_FIFO_SIZE - ((uart_device->FSR & UART_FSR_TX_POINTER_Msk) >> UART_FSR_TX_POINTER_Pos));
-    }
-#elif defined(__M460__)
-#if defined (__M460MINIMA__)
-    if( use_vcom == 1 )
-    {
-        /*
+		/*
             To do VCOM availability
         */
         return ((int)(EPA_MAX_PKT_SIZE) - (int)(vcom_device->EP[EPA].EPDATCNT & 0xffff));
-    }
-#else        
-    if (UART_IS_TX_FULL(uart_device))
-    {
-        return 0;
-    }
-    else
-    {
-        if(uart_device == UART0)
-            return (UART0_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
-        else if(uart_device == UART1)
-            return (UART1_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
-		else if(uart_device == UART3)
-            return (UART3_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
-        else if(uart_device == UART4)
-            return (UART4_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
-    }
-#endif//(__M460MINIMA__)    
-#elif defined(__M032BT__) || defined(__M032KG__)|| defined(__M252__) || defined(__M480__)
+	}
+    else if(u32ModuleNum == UART_USE_NOUSE)
+	{
+		return -1;
+	}
+	else//u32ModuleNum = UART_USE_UART0, UART_USE_UART1... etc
+	{
+		if (UART_IS_TX_FULL(uart_device))
+        {
+            return 0;
+        }
+        else
+        {
+            if(uart_device == UART0)
+                return (UART0_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
+            else if(uart_device == UART1)
+                return (UART1_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
+		    else if(uart_device == UART3)
+                return (UART3_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
+            else if(uart_device == UART4)
+                return (UART4_FIFO_SIZE - ((uart_device->FIFOSTS & UART_FIFOSTS_TXPTR_Msk) >> UART_FIFOSTS_TXPTR_Pos));
+        }
+	}
 
 #endif
 
@@ -407,43 +314,50 @@ int HardwareSerial::availableForWrite(void)
 
 int HardwareSerial::available(void)
 {
-#if defined(__M460MINIMA__)    
-    return (int)(gu32RxCount);
-#else
-    return (unsigned int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % SERIAL_BUFFER_SIZE;
-#endif    
+    if(u32ModuleNum == UART_USE_VCOM)
+    {
+		return (int)(gu32RxCount);
+	}
+    else if(u32ModuleNum == UART_USE_NOUSE)
+	{
+		return -1;
+	}
+	else
+	{
+		//u32ModuleNum = UART_USE_UART0, UART_USE_UART1... etc
+        return (unsigned int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % SERIAL_BUFFER_SIZE;
+	}	  
 }
 
 size_t HardwareSerial::write(const uint8_t ch)
 {
-#if defined(__M451__) || defined(__M032BT__) || defined(__M032KG__) || defined(__M252__)|| defined(__M480__)
-    
-#elif defined(__M460__)
-    #if defined(__M460MINIMA__)
-        /*To do:VCOM Tx, single byte TX*/
+#if defined(__M460__)
+	if(u32ModuleNum == UART_USE_VCOM)
+    {
+		/*To do:VCOM Tx, single byte TX*/
         vcom_device->EP[EPA].EPDAT_BYTE = ch;
         vcom_device->EP[EPA].EPRSPCTL = HSUSBD_EP_RSPCTL_SHORTTXEN;    // packet end
         vcom_device->EP[EPA].EPTXCNT = 1;
         HSUSBD_ENABLE_EP_INT(EPA, HSUSBD_EPINTEN_INTKIEN_Msk);
-    #else
+	}
+    else if(u32ModuleNum == UART_USE_NOUSE)
+	{
+		return -1;
+	}
+	else
+	{
+		//u32ModuleNum = UART_USE_UART0, UART_USE_UART1... etc
         while (uart_device->FIFOSTS & UART_FIFOSTS_TXFULL_Msk);
         uart_device->DAT = ch;
-    #endif
+	}	  
     return 1;
-#elif defined(__NUC240__) || defined(__NUC131__)
-
-#elif defined(__NANO100__)
-
-#elif defined(__NANO1X2__)
 
 #endif
 }
 
 void HardwareSerial::flush(void)
 {
-#if defined(__M451__)
-    
-#endif
+
     /* No need to implement because we use hardware UART and it is with hardware FIFO*/
 }
 

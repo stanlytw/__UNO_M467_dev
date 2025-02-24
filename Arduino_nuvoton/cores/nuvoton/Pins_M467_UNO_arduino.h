@@ -77,6 +77,7 @@ typedef struct _UARTPinDescription
 {
     UART_T *U;
     uint32_t module;
+	uint32_t  modulenum;
     IRQn_Type irq;
     PinType pintype[2];
     uint32_t clksrcsel;
@@ -147,10 +148,22 @@ do { \
 }while(0);
 
 /*========== UART definition ==========*/
-#define UART_MAX_COUNT 2 //__M467SJHN__
+#define UART_MAX_COUNT 3 //__M467SJHN__
 extern UARTPinDescription UART_Desc[];
 #define UART_RX 0
 #define UART_TX 1
+#define UART_USE_UART0           (0x00)
+#define UART_USE_UART1           (0x01)
+#define UART_USE_UART2           (0x02)
+#define UART_UAE_UART3           (0x03)
+#define UART_USE_VCOM            (0x0C)
+#define UART_USE_NOUSE           (0x0F)
+#define UART_CLKDIV_1            (0x01)
+#define UART_CLKDIV_2            (0x02)
+#define UART_DESC_IDX0           (0x00)
+#define UART_DESC_IDX1           (0x01)
+#define UART_DESC_IDX2           (0x02)
+
 #define UART_Config(Desc) \
 do { \
     uint8_t i; \
