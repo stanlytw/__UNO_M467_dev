@@ -51,7 +51,7 @@ void analogReference(eAnalogReference ulMode)
 
 uint32_t analogRead(uint32_t ulPin)
 {
-#if defined(__M451__) || defined(__M252__) || defined(__M480__)|| defined(__M460__)
+#if defined(__M460__)
   volatile uint32_t ulValue = 0;  
 
   if(ulPin>ADC_MAX_COUNT || ADC_Desc[ulPin].A==NULL) return 0;  	  
@@ -62,7 +62,7 @@ uint32_t analogRead(uint32_t ulPin)
   ADC_Config(ADC_Desc[ulPin]);
   
   /* Set the ADC internal sampling time, input mode as single-end and enable the A/D converter */
-#if defined(__M252__)|| defined(__M480__) ||defined(__M460__)
+#if defined(__M460__)
 	EADC_Open(ADC_Desc[ulPin].A, 0);
 	EADC_SetExtendSampleTime(EADC, ADC_Desc[ulPin].ch, 6);
 #else
@@ -94,18 +94,8 @@ uint32_t analogRead(uint32_t ulPin)
 	ulValue=EADC_GET_CONV_DATA(EADC, ADC_Desc[ulPin].ch);
 	ulValue = mapResolution(ulValue, 12, _readResolution);
 
-  // Close ADC
-  EADC_Close(ADC_Desc[ulPin].A);
-
-#elif defined(__NUC240__)
-
-
-#elif defined(__NANO100__) || defined(__NANO1X2__)
-
-
-#elif defined(__NUC131__)
-
-#elif defined(__M032BT__)|| defined(__M032KG__)
+    // Close ADC
+    EADC_Close(ADC_Desc[ulPin].A);
 
 #endif
   return ulValue;	
@@ -130,11 +120,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	ulValue = mapResolution(ulValue, _writeResolution, 8);
 	
 	ulValue=((ulValue+1)*100)/(1<<_writeResolution);
-#if defined(__M451__)
-
-#elif defined(__M252__)
-
-#elif defined(__M480__)|| defined(__M460__)
+#if defined(__M460__)
 	if(ulValue==0)
 	{  
 		int32_t pin=PWM_Desc[ulPin].pintype.num;
@@ -145,13 +131,6 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		fixValue[ulPin]=ulValue;
 		return;
 	}
-#elif defined(__NUC240__)
-
-#elif defined(__NANO100__) || defined(__NANO1X2__)
-
-#elif defined(__NUC131__)
-
-#elif defined(__M032BT__)
 
 #endif	
 
@@ -164,7 +143,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		//Set Mutifunction pins
 		PWM_Config(PWM_Desc[ulPin]);		
 
-#if defined(__M480__)|| defined(__M460__)	
+#if defined(__M460__)	
        //Config PWMs
 		EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
 		
@@ -182,7 +161,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	//Config PWMs		
 	if(fixValue[ulPin]!=ulValue)
 	{
-#if defined(__M480__)|| defined(__M460__)		
+#if defined(__M460__)		
 		EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
 #else
         

@@ -121,11 +121,37 @@ extern GPIOPinDescription GPIO_Desc[];
 
 /*========== PWM definition ==========*/
 #define PWM_MAX_COUNT 8
+#define PWM_USE_PWM               (0xE0)
+#define PWM_USE_EPWM              (0xE1)
+#define PWM_CHANNEL_CH0           (0x00)
+#define PWM_CHANNEL_CH1           (0x01)
+#define PWM_CHANNEL_CH2           (0x02)
+#define PWM_CHANNEL_CH3           (0x03)
+#define PWM_FREQUENCY_500HZ       (500)
+
+
 extern EPWMPinDescription PWM_Desc[];
 #define PWM_Config(Desc) outp32(GPIO_Desc[Desc.pintype.num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype.num].Pin.MFP) & ~GPIO_Desc[Desc.pintype.num].Pin.Mask) | Desc.pintype.type);
 
 /*========== ADC definition ==========*/
 #define ADC_MAX_COUNT 6
+#define ADC_USE_EADC0             (0xD0)
+#define ADC_USE_EADC1             (0xD1)
+#define ADC_CHANNEL_CH0           (0)
+#define ADC_CHANNEL_CH1           (1)
+#define ADC_CHANNEL_CH2           (2)
+#define ADC_CHANNEL_CH3           (3)
+#define ADC_CHANNEL_CH4           (4)
+#define ADC_CHANNEL_CH5           (5)
+#define ADC_CHANNEL_CH6           (6)
+#define ADC_CHANNEL_CH7           (7)
+#define ADC_CHANNEL_CH8           (8)
+#define ADC_CHANNEL_CH9           (9)
+#define ADC_CHANNEL_CH10          (10)
+#define ADC_CHANNEL_CH11          (11)
+#define ADC_CHANNEL_CH12          (12)
+#define ADC_CHANNEL_CH13          (13)
+
 extern ADCPinDescription ADC_Desc[];
 #define ADC_Config(Desc) outp32(GPIO_Desc[Desc.pintype.num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype.num].Pin.MFP) & ~GPIO_Desc[Desc.pintype.num].Pin.Mask) | Desc.pintype.type);
 
@@ -148,7 +174,7 @@ do { \
 }while(0);
 
 /*========== UART definition ==========*/
-#define UART_MAX_COUNT 3 //__M467SJHN__
+#define UART_MAX_COUNT 3//Test GPIO 3 //__M467SJHN__
 extern UARTPinDescription UART_Desc[];
 #define UART_RX 0
 #define UART_TX 1
@@ -172,7 +198,7 @@ do { \
 }while(0);
 
 /*========== I2C definition ==========*/
-#define I2C_MAX_COUNT 1
+#define I2C_MAX_COUNT 2
 
 extern I2CPinDescription I2C_Desc[];
 #define I2C_SDA 0
@@ -193,13 +219,18 @@ static const uint8_t LED_BUILTIN = 7;
 static const uint8_t SDA = 14;
 static const uint8_t SCL = 15;
 
-/*UNO-M467SJ A0~A5 sharing with D14~D19*/
-static const uint8_t A0  = 14;
-static const uint8_t A1  = 15;
-static const uint8_t A2  = 16;
-static const uint8_t A3  = 17;
-static const uint8_t A4  = 18;
-static const uint8_t A5  = 19;
+/*
+   UNO-M467SJ A0~A5 sharing with D14~D19
+   However, ADC pin number(ulPin)does not use USE_BoardToPin scheme.
+   example : ADC_Desc[ulPin]
+*/
+static const uint8_t A0  = 0;//0th element in ADC_Desc[]
+static const uint8_t A1  = 1;//1th element in ADC_Desc[]
+static const uint8_t A2  = 2;//2th element in ADC_Desc[]
+static const uint8_t A3  = 3;//3th element in ADC_Desc[]
+static const uint8_t A4  = 4;//4th element in ADC_Desc[]
+static const uint8_t A5  = 5;//5th element in ADC_Desc[]
+static const uint8_t A6  = 5;//5th element in ADC_Desc[], dummy for test ADC
 
 static const uint8_t D0  = 0;
 static const uint8_t D1  = 1;
