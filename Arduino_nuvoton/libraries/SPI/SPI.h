@@ -129,7 +129,7 @@ class SPIClass {
 	union{
 		void *_vspi;
 		SPI_T *spi;
-#if defined(__M032BT__) || defined(__M032KG__)|| defined(__M252__) || defined(__M480__)|| defined(__M460__) 
+#if defined(__M460__) 
 		USPI_T *uspi;
 #endif
 	};
