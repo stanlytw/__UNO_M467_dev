@@ -52,16 +52,21 @@ void analogReference(eAnalogReference ulMode)
 uint32_t analogRead(uint32_t ulPin)
 {
 #if defined(__M460__)
-  volatile uint32_t ulValue = 0;  
-
-  if(ulPin>ADC_MAX_COUNT || ADC_Desc[ulPin].A==NULL) return 0;  	  
-  	  	
+    volatile uint32_t ulValue = 0;  
+#if 0//def USE_BoardToPin
+    if (ulPin > BoardToPin_MAX_COUNT) return;
+	if(BoardToPinInfo[ulPin].type!=ADC_TYPE) return;
+    //if (BoardToPinInfo[ulPin].pin == -1) return;
+    ulPin = BoardToPinInfo[ulPin].num;
+#else
+    if(ulPin>ADC_MAX_COUNT || ADC_Desc[ulPin].A==NULL) return 0;  	  
+#endif  	  	
 	/* Disable the digital input path to avoid the leakage current. */
-  GPIO_DISABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num].bit);
+    GPIO_DISABLE_DIGITAL_PATH(GPIO_Desc[ADC_Desc[ulPin].pintype.num].P,GPIO_Desc[ADC_Desc[ulPin].pintype.num].bit);
    
-  ADC_Config(ADC_Desc[ulPin]);
+    ADC_Config(ADC_Desc[ulPin]);
   
-  /* Set the ADC internal sampling time, input mode as single-end and enable the A/D converter */
+    /* Set the ADC internal sampling time, input mode as single-end and enable the A/D converter */
 #if defined(__M460__)
 	EADC_Open(ADC_Desc[ulPin].A, 0);
 	EADC_SetExtendSampleTime(EADC, ADC_Desc[ulPin].ch, 6);
@@ -120,7 +125,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	ulValue = mapResolution(ulValue, _writeResolution, 8);
 	
 	ulValue=((ulValue+1)*100)/(1<<_writeResolution);
-#if defined(__M460__)
+
 	if(ulValue==0)
 	{  
 		int32_t pin=PWM_Desc[ulPin].pintype.num;
@@ -132,44 +137,65 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		return;
 	}
 
-#endif	
 
-#if defined(__M032BT__)
-
-
-#else
 	if (!pinEnabled[ulPin]){
 		
-		//Set Mutifunction pins
-		PWM_Config(PWM_Desc[ulPin]);		
+		if(PWM_Desc[ulPin].moduletype == PWM_USE_EPWM )
+		{	
+		    //Set Mutifunction pins, module type independent
+		    PWM_Config(PWM_Desc[ulPin]);		
 
-#if defined(__M460__)	
-       //Config PWMs
-		EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
+            //Config PWMs
+		    EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
 		
-		//Enable PWM output
-		EPWM_EnableOutput(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));
+		    //Enable PWM output
+		    EPWM_EnableOutput(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));
 		
-		//Start PWM
-		EPWM_Start(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));  
-#else
+		    //Start PWM
+		    EPWM_Start(PWM_Desc[ulPin].P,(1<<PWM_Desc[ulPin].ch));  
+
+		    pinEnabled[ulPin] = 1;
+		}
+		else if(PWM_Desc[ulPin].moduletype == PWM_USE_BPWM )
+		{
+			//Set Mutifunction pins, module type independent
+		    PWM_Config(PWM_Desc[ulPin]);		
+
+            //Config PWMs
+		    BPWM_ConfigOutputChannel((BPWM_T  *)(PWM_Desc[ulPin].P),PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
 		
-#endif		
-		pinEnabled[ulPin] = 1;
+		    //Enable PWM output
+		    BPWM_EnableOutput((BPWM_T  *)(PWM_Desc[ulPin].P),(1<<PWM_Desc[ulPin].ch));
+		
+		    //Start PWM
+		    BPWM_Start((BPWM_T  *)(PWM_Desc[ulPin].P),(1<<PWM_Desc[ulPin].ch));  
+			
+			pinEnabled[ulPin] = 1;
+		}
+		else
+		{
+			/*To do*/
+		}
 	}
 	
 	//Config PWMs		
 	if(fixValue[ulPin]!=ulValue)
 	{
-#if defined(__M460__)		
-		EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
-#else
-        
-#endif
-		fixValue[ulPin]=ulValue;
+		if(PWM_Desc[ulPin].moduletype == PWM_USE_EPWM )
+		{	
+		    EPWM_ConfigOutputChannel(PWM_Desc[ulPin].P,PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
+	    }
+		else if(PWM_Desc[ulPin].moduletype == PWM_USE_BPWM )
+		{
+			BPWM_ConfigOutputChannel((BPWM_T  *)(PWM_Desc[ulPin].P),PWM_Desc[ulPin].ch,PWM_Desc[ulPin].freq,ulValue);
+		}
+		else
+		{
+		    /*To do*/	
+		}
+    	fixValue[ulPin]=ulValue;
 	}
-#endif
-	
+
 	return;
 }
 

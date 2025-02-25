@@ -53,6 +53,7 @@ typedef struct _EPWMPinDescription
 {
     EPWM_T  *P;
     uint32_t module;
+	uint32_t moduletype;
     IRQn_Type irq;
     uint32_t ch;
     uint32_t freq;
@@ -121,14 +122,19 @@ extern GPIOPinDescription GPIO_Desc[];
 
 /*========== PWM definition ==========*/
 #define PWM_MAX_COUNT 8
-#define PWM_USE_PWM               (0xE0)
+#define PWM_USE_BPWM              (0xE0)
 #define PWM_USE_EPWM              (0xE1)
 #define PWM_CHANNEL_CH0           (0x00)
 #define PWM_CHANNEL_CH1           (0x01)
 #define PWM_CHANNEL_CH2           (0x02)
 #define PWM_CHANNEL_CH3           (0x03)
+#define PWM_CHANNEL_CH4           (0x04)
+#define PWM_CHANNEL_CH5           (0x05)
 #define PWM_FREQUENCY_500HZ       (500)
-
+#define PWM_DESC_IDX0             (0x00)
+#define PWM_DESC_IDX1             (0x01)
+#define PWM_DESC_IDX2             (0x02)
+#define PWM_DESC_IDX_NOUSE        (0xF0)
 
 extern EPWMPinDescription PWM_Desc[];
 #define PWM_Config(Desc) outp32(GPIO_Desc[Desc.pintype.num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype.num].Pin.MFP) & ~GPIO_Desc[Desc.pintype.num].Pin.Mask) | Desc.pintype.type);
@@ -151,6 +157,14 @@ extern EPWMPinDescription PWM_Desc[];
 #define ADC_CHANNEL_CH11          (11)
 #define ADC_CHANNEL_CH12          (12)
 #define ADC_CHANNEL_CH13          (13)
+#define ADC_DESC_IDX0             (0x00)
+#define ADC_DESC_IDX1             (0x01)
+#define ADC_DESC_IDX2             (0x02)
+#define ADC_DESC_IDX3             (0x03)
+#define ADC_DESC_IDX4             (0x04)
+#define ADC_DESC_IDX5             (0x05)
+
+
 
 extern ADCPinDescription ADC_Desc[];
 #define ADC_Config(Desc) outp32(GPIO_Desc[Desc.pintype.num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype.num].Pin.MFP) & ~GPIO_Desc[Desc.pintype.num].Pin.Mask) | Desc.pintype.type);
@@ -229,8 +243,7 @@ static const uint8_t A1  = 1;//1th element in ADC_Desc[]
 static const uint8_t A2  = 2;//2th element in ADC_Desc[]
 static const uint8_t A3  = 3;//3th element in ADC_Desc[]
 static const uint8_t A4  = 4;//4th element in ADC_Desc[]
-static const uint8_t A5  = 5;//5th element in ADC_Desc[]
-static const uint8_t A6  = 5;//5th element in ADC_Desc[], dummy for test ADC
+static const uint8_t A5  = 5;//5th element in ADC_Desc[], PB0 for test ADC
 
 static const uint8_t D0  = 0;
 static const uint8_t D1  = 1;

@@ -37,60 +37,90 @@ sdh.o:
 00000000 T SDH_Write
          U SYS_IsRegLocked
          U SystemCoreClock
-00000000 b u32SD_ClkSrc.8821
+00000000 b u32SD_ClkSrc.8937
 
 wdt.o:
          U SystemCoreClock
 00000000 T WDT_Open
 
-i2c.o:
-         U CLK_GetPCLK0Freq
-         U CLK_GetPCLK1Freq
-00000000 B g_I2C_i32ErrCode
-00000000 T I2C_ClearTimeoutFlag
-00000000 T I2C_Close
-00000000 T I2C_DisableInt
-00000000 T I2C_DisableTimeout
-00000000 T I2C_DisableWakeup
-00000000 T I2C_EnableInt
-00000000 T I2C_EnableTimeout
-00000000 T I2C_EnableWakeup
-00000000 T I2C_GetBusClockFreq
-00000000 T I2C_GetData
-00000000 T I2C_GetIntFlag
-00000000 T I2C_GetStatus
-00000000 T I2C_Open
-00000000 T I2C_ReadByte
-00000000 T I2C_ReadByteOneReg
-00000000 T I2C_ReadByteTwoRegs
-00000000 T I2C_ReadMultiBytes
-00000000 T I2C_ReadMultiBytesOneReg
-00000000 T I2C_ReadMultiBytesTwoRegs
-00000000 T I2C_SetBusClockFreq
-00000000 T I2C_SetData
-00000000 T I2C_SetSlaveAddr
-00000000 T I2C_SetSlaveAddrMask
-00000000 T I2C_SMBusClearInterruptFlag
-00000000 T I2C_SMBusClockLoTimeout
-00000000 T I2C_SMBusClose
-00000000 T I2C_SMBusGetPECValue
-00000000 T I2C_SMBusGetStatus
-00000000 T I2C_SMBusIdleTimeout
-00000000 T I2C_SMBusOpen
-00000000 T I2C_SMBusPECTxEnable
-00000000 T I2C_SMBusSetPacketByteCount
-00000000 T I2C_SMBusTimeout
-00000000 T I2C_Trigger
-00000000 T I2C_WriteByte
-00000000 T I2C_WriteByteOneReg
-00000000 T I2C_WriteByteTwoRegs
-00000000 T I2C_WriteMultiBytes
-00000000 T I2C_WriteMultiBytesOneReg
-00000000 T I2C_WriteMultiBytesTwoRegs
+hsusbd.o:
+00000000 b g_hsusbd_buf
+00000000 B g_hsusbd_Configured
+00000000 b g_hsusbd_CtrlInPointer
+00000000 B g_hsusbd_CtrlInSize
+00000000 d g_hsusbd_CtrlMaxPktSize
+00000000 B g_hsusbd_CtrlZero
+00000000 B g_hsusbd_DmaDone
+00000000 b g_hsusbd_EnableTestMode
+00000000 B g_hsusbd_pfnClassRequest
+00000000 B g_hsusbd_pfnSetInterface
+00000000 B g_hsusbd_pfnVendorRequest
+00000000 B g_hsusbd_RemoteWakeupEn
+00000000 B g_hsusbd_ShortPacket
+00000004 C g_hsusbd_sInfo
+00000000 b g_hsusbd_TestSelector
+00000000 B g_hsusbd_UsbAddr
+00000000 b g_hsusbd_UsbAltInterface
+00000000 b g_hsusbd_UsbConfig
+00000000 B g_u32HsEpStallLock
+00000008 C gUsbCmd
+00000000 T HSUSBD_CtrlIn
+00000000 T HSUSBD_CtrlOut
+00000000 T HSUSBD_GetDescriptor
+00000000 T HSUSBD_Open
+00000000 T HSUSBD_PrepareCtrlIn
+00000000 T HSUSBD_ProcessSetupPacket
+00000000 T HSUSBD_SetVendorRequest
+00000000 T HSUSBD_StandardRequest
+00000000 T HSUSBD_Start
+00000000 T HSUSBD_SwReset
+00000000 T HSUSBD_UpdateDeviceState
          U SystemCoreClock
 
 wwdt.o:
 00000000 T WWDT_Open
+
+rtc.o:
+00000000 b g_u32hiDay
+00000000 b g_u32hiHour
+00000000 b g_u32hiMin
+00000000 b g_u32hiMonth
+00000000 b g_u32hiSec
+00000000 b g_u32hiYear
+00000000 b g_u32loDay
+00000000 b g_u32loHour
+00000000 b g_u32loMin
+00000000 b g_u32loMonth
+00000000 b g_u32loSec
+00000000 b g_u32loYear
+00000000 T RTC_32KCalibration
+00000000 T RTC_Close
+00000000 T RTC_DisableInt
+00000000 T RTC_DisableSpareRegister
+00000000 T RTC_DynamicTamperConfig
+00000000 T RTC_DynamicTamperDisable
+00000000 T RTC_DynamicTamperEnable
+00000000 T RTC_EnableInt
+00000000 T RTC_EnableSpareAccess
+00000000 T RTC_GetAlarmDateAndTime
+00000000 T RTC_GetDateAndTime
+00000000 T RTC_GetDayOfWeek
+00000000 T RTC_Open
+00000000 T RTC_SetAlarmDate
+00000000 T RTC_SetAlarmDateAndTime
+00000000 T RTC_SetAlarmDateMask
+00000000 T RTC_SetAlarmTime
+00000000 T RTC_SetAlarmTimeMask
+00000000 T RTC_SetClockSource
+00000000 T RTC_SetDate
+00000000 T RTC_SetDateAndTime
+00000000 T RTC_SetGPIOLevel
+00000000 T RTC_SetGPIOMode
+00000000 T RTC_SetTickPeriod
+00000000 T RTC_SetTime
+00000000 T RTC_StaticTamperDisable
+00000000 T RTC_StaticTamperEnable
+         U SystemCoreClock
 
 timer.o:
          U CLK_GetPCLK0Freq
@@ -126,6 +156,46 @@ sys.o:
 00000000 T SYS_SetPowerLevel
 00000000 T SYS_SetVRef
          U SystemCoreClock
+
+bpwm.o:
+00000000 T BPWM_ClearADCTriggerFlag
+00000000 T BPWM_ClearCaptureIntFlag
+00000000 T BPWM_ClearDutyIntFlag
+00000000 T BPWM_ClearPeriodIntFlag
+00000000 T BPWM_ClearWrapAroundFlag
+00000000 T BPWM_ClearZeroIntFlag
+00000000 T BPWM_ConfigCaptureChannel
+00000000 T BPWM_ConfigOutputChannel
+00000000 T BPWM_DisableADCTrigger
+00000000 T BPWM_DisableCapture
+00000000 T BPWM_DisableCaptureInt
+00000000 T BPWM_DisableDutyInt
+00000000 T BPWM_DisableLoadMode
+00000000 T BPWM_DisableOutput
+00000000 T BPWM_DisablePeriodInt
+00000000 T BPWM_DisableZeroInt
+00000000 T BPWM_EnableADCTrigger
+00000000 T BPWM_EnableCapture
+00000000 T BPWM_EnableCaptureInt
+00000000 T BPWM_EnableDutyInt
+00000000 T BPWM_EnableLoadMode
+00000000 T BPWM_EnableOutput
+00000000 T BPWM_EnablePeriodInt
+00000000 T BPWM_EnableZeroInt
+00000000 T BPWM_ForceStop
+00000000 T BPWM_GetADCTriggerFlag
+00000000 T BPWM_GetCaptureIntFlag
+00000000 T BPWM_GetDutyIntFlag
+00000000 T BPWM_GetPeriodIntFlag
+00000000 T BPWM_GetWrapAroundFlag
+00000000 T BPWM_GetZeroIntFlag
+00000000 T BPWM_SetClockSource
+00000000 T BPWM_Start
+00000000 T BPWM_Stop
+         U CLK_GetPCLK0Freq
+         U CLK_GetPCLK1Freq
+         U CLK_GetPLLClockFreq
+         U SystemCoreClockUpdate
 
 epwm.o:
          U CLK_GetPCLK0Freq
@@ -291,6 +361,52 @@ eadc.o:
 00000000 T EADC_SetExtendSampleTime
 00000000 T EADC_SetTriggerDelayTime
          U SYS_IsRegLocked
+         U SystemCoreClock
+
+i2c.o:
+         U CLK_GetPCLK0Freq
+         U CLK_GetPCLK1Freq
+00000000 B g_I2C_i32ErrCode
+00000000 T I2C_ClearTimeoutFlag
+00000000 T I2C_Close
+00000000 T I2C_DisableInt
+00000000 T I2C_DisableTimeout
+00000000 T I2C_DisableWakeup
+00000000 T I2C_EnableInt
+00000000 T I2C_EnableTimeout
+00000000 T I2C_EnableWakeup
+00000000 T I2C_GetBusClockFreq
+00000000 T I2C_GetData
+00000000 T I2C_GetIntFlag
+00000000 T I2C_GetStatus
+00000000 T I2C_Open
+00000000 T I2C_ReadByte
+00000000 T I2C_ReadByteOneReg
+00000000 T I2C_ReadByteTwoRegs
+00000000 T I2C_ReadMultiBytes
+00000000 T I2C_ReadMultiBytesOneReg
+00000000 T I2C_ReadMultiBytesTwoRegs
+00000000 T I2C_SetBusClockFreq
+00000000 T I2C_SetData
+00000000 T I2C_SetSlaveAddr
+00000000 T I2C_SetSlaveAddrMask
+00000000 T I2C_SMBusClearInterruptFlag
+00000000 T I2C_SMBusClockLoTimeout
+00000000 T I2C_SMBusClose
+00000000 T I2C_SMBusGetPECValue
+00000000 T I2C_SMBusGetStatus
+00000000 T I2C_SMBusIdleTimeout
+00000000 T I2C_SMBusOpen
+00000000 T I2C_SMBusPECTxEnable
+00000000 T I2C_SMBusSetPacketByteCount
+00000000 T I2C_SMBusTimeout
+00000000 T I2C_Trigger
+00000000 T I2C_WriteByte
+00000000 T I2C_WriteByteOneReg
+00000000 T I2C_WriteByteTwoRegs
+00000000 T I2C_WriteMultiBytes
+00000000 T I2C_WriteMultiBytesOneReg
+00000000 T I2C_WriteMultiBytesTwoRegs
          U SystemCoreClock
 
 clk.o:
@@ -519,79 +635,3 @@ startup_M460.o:
 00000000 W USCI0_IRQHandler
 00000000 W WDT_IRQHandler
 00000000 W WWDT_IRQHandler
-
-hsusbd.o:
-00000000 b g_hsusbd_buf
-00000000 B g_hsusbd_Configured
-00000000 b g_hsusbd_CtrlInPointer
-00000000 B g_hsusbd_CtrlInSize
-00000000 d g_hsusbd_CtrlMaxPktSize
-00000000 B g_hsusbd_CtrlZero
-00000000 B g_hsusbd_DmaDone
-00000000 b g_hsusbd_EnableTestMode
-00000000 B g_hsusbd_pfnClassRequest
-00000000 B g_hsusbd_pfnSetInterface
-00000000 B g_hsusbd_pfnVendorRequest
-00000000 B g_hsusbd_RemoteWakeupEn
-00000000 B g_hsusbd_ShortPacket
-00000004 C g_hsusbd_sInfo
-00000000 b g_hsusbd_TestSelector
-00000000 B g_hsusbd_UsbAddr
-00000000 b g_hsusbd_UsbAltInterface
-00000000 b g_hsusbd_UsbConfig
-00000000 B g_u32HsEpStallLock
-00000008 C gUsbCmd
-00000000 T HSUSBD_CtrlIn
-00000000 T HSUSBD_CtrlOut
-00000000 T HSUSBD_GetDescriptor
-00000000 T HSUSBD_Open
-00000000 T HSUSBD_PrepareCtrlIn
-00000000 T HSUSBD_ProcessSetupPacket
-00000000 T HSUSBD_SetVendorRequest
-00000000 T HSUSBD_StandardRequest
-00000000 T HSUSBD_Start
-00000000 T HSUSBD_SwReset
-00000000 T HSUSBD_UpdateDeviceState
-         U SystemCoreClock
-
-rtc.o:
-00000000 b g_u32hiDay
-00000000 b g_u32hiHour
-00000000 b g_u32hiMin
-00000000 b g_u32hiMonth
-00000000 b g_u32hiSec
-00000000 b g_u32hiYear
-00000000 b g_u32loDay
-00000000 b g_u32loHour
-00000000 b g_u32loMin
-00000000 b g_u32loMonth
-00000000 b g_u32loSec
-00000000 b g_u32loYear
-00000000 T RTC_32KCalibration
-00000000 T RTC_Close
-00000000 T RTC_DisableInt
-00000000 T RTC_DisableSpareRegister
-00000000 T RTC_DynamicTamperConfig
-00000000 T RTC_DynamicTamperDisable
-00000000 T RTC_DynamicTamperEnable
-00000000 T RTC_EnableInt
-00000000 T RTC_EnableSpareAccess
-00000000 T RTC_GetAlarmDateAndTime
-00000000 T RTC_GetDateAndTime
-00000000 T RTC_GetDayOfWeek
-00000000 T RTC_Open
-00000000 T RTC_SetAlarmDate
-00000000 T RTC_SetAlarmDateAndTime
-00000000 T RTC_SetAlarmDateMask
-00000000 T RTC_SetAlarmTime
-00000000 T RTC_SetAlarmTimeMask
-00000000 T RTC_SetClockSource
-00000000 T RTC_SetDate
-00000000 T RTC_SetDateAndTime
-00000000 T RTC_SetGPIOLevel
-00000000 T RTC_SetGPIOMode
-00000000 T RTC_SetTickPeriod
-00000000 T RTC_SetTime
-00000000 T RTC_StaticTamperDisable
-00000000 T RTC_StaticTamperEnable
-         U SystemCoreClock

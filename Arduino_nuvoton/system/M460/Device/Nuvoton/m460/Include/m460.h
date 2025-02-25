@@ -786,7 +786,7 @@ typedef volatile unsigned int   vu32;       ///< Define 32-bit unsigned volatile
 //#include "i2s.h"
 #include "epwm.h"
 #include "eadc.h"
-//#include "bpwm.h"
+#include "bpwm.h"
 #include "wdt.h"
 #include "wwdt.h"
 //#include "crc.h"

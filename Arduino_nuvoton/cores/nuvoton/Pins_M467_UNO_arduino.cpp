@@ -26,28 +26,28 @@
 BoardToPin BoardToPinInfo[] =
 {
     //{pin, type, num}//
-	{ 21, UART_TYPE,0},// 0:      (D0/PA6/UART_RX0)
-    { 20, UART_TYPE,0},// 1:      (D1/PA7/UART_TX0)
-    { 19, PWM_TYPE, 0}, // 2:      (D2/PC6/PWM)
-    { 18, PWM_TYPE, 1}, // 3:      (D3/PC7/PWM)
-    { 25, PWM_TYPE, 2}, // 4:      (D4/PA5/PWM)
-    { 26, PWM_TYPE, 3}, // 5:      (D5/PA4/PWM)
-    {  8, PWM_TYPE, 4}, // 6:      (D6/PA11/PWM)
-    { 52, PWM_TYPE, 5}, // 7:      (D7/PC14/PWM)
+	{ 21, UART_TYPE, 0                 },// 0:      (D0/PA6/UART_RX0)
+    { 20, UART_TYPE, 0                 },// 1:      (D1/PA7/UART_TX0)
+    { 19, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 2:      (D2/PC6/PWM)
+    { 18, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 3:      (D3/PC7/PWM)
+    { 25, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 4:      (D4/PA5/PWM)
+    { 26, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 5:      (D5/PA4/PWM)
+    {  8, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 6:      (D6/PA11/PWM)
+    { 52, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 7:      (D7/PC14/PWM)
 
-    {  7, PWM_TYPE, 6}, // 8:      (D8/PB0/PWM)
-    { 12, PWM_TYPE, 7}, // 9:      (D9/PF6/PWM)
-    { 27, SPI_TYPE, 0}, //10:      (D10/PA3/SPI0_CS)
-    { 30, SPI_TYPE, 0}, //11:      (D11/PA0/SPI0_MOSI)
-    { 29, SPI_TYPE, 0}, //12:      (D12/PA1/SPI0_MISO)
-    { 28, SPI_TYPE, 0}, //13:      (D13/PA2/SPI0_SCK)
+    {  7, PWM_TYPE, PWM_DESC_IDX2      }, // 8:      (D8/PB0/PWM)
+    { 12, PWM_TYPE, PWM_DESC_IDX_NOUSE }, // 9:      (D9/PF6/PWM)
+    { 27, SPI_TYPE, 0                  }, //10:      (D10/PA3/SPI0_CS)
+    { 30, SPI_TYPE, 0                  }, //11:      (D11/PA0/SPI0_MOSI)
+    { 29, SPI_TYPE, 0                  }, //12:      (D12/PA1/SPI0_MISO)
+    { 28, SPI_TYPE, 0                  }, //13:      (D13/PA2/SPI0_SCK)
 	
-	{ 55, ADC_TYPE, 0}, //14:      (D14/PB13/A0)
-    { 60, ADC_TYPE, 1}, //15:      (D15/PB11/A1)
-    { 61, ADC_TYPE, 2}, //16:      (D16/PB10/A2)
-    { 62, ADC_TYPE, 3}, //17:      (D17/PB9/A3)
-    { 56, I2C_TYPE, 0}, //18:      (D18/PB12/I2C0_SDA/A4)
-    { 55, I2C_TYPE, 0}, //19:      (D19/PB13/I2C0_SCL/A5)
+	{ 55, ADC_TYPE, 0                  }, //14:      (D14/PB13/A0)
+    { 60, ADC_TYPE, 1                  }, //15:      (D15/PB11/A1)
+    { 61, ADC_TYPE, 2                  }, //16:      (D16/PB10/A2)
+    { 62, ADC_TYPE, PWM_DESC_IDX_NOUSE }, //17:      (D17/PB9/A3), PWM not testable
+    { 56, I2C_TYPE, 0                  }, //18:      (D18/PB12/I2C0_SDA/A4)
+    { 55, PWM_TYPE, PWM_DESC_IDX_NOUSE }, //19:      (D19/PB13/I2C0_SCL/A5), PWM not testable
  
     { -1,        0, 0}, //22: NC
     { -1,        0, 0}, //23: NC
@@ -67,11 +67,6 @@ BoardToPin BoardToPinInfo[] =
     { -1,        0, 0}, //37: NC
     { -1,        0, 0}, //38: NC
     { -1,        0, 0}, //39: NC
-
-    //{ 15, SPI_TYPE, 1}, //40: PA9(USCI0_DAT1)    (SPI2-MISO)
-    //{ 13, SPI_TYPE, 1}, //41: PA11(USCI0_CLK)    (SPI2-SS)
-    //{ 14, SPI_TYPE, 1}, //42: PA10(USCI0_DAT0)   (SPI2-CLK)
-    //{ 16, SPI_TYPE, 1}, //43: PA8(USCI0_CTL1)    (SPI2-MOSI)
 
 };
 #endif
@@ -160,15 +155,10 @@ GPIOPinDescription GPIO_Desc[] =
 
 EPWMPinDescription PWM_Desc[] = 
 {
-    {EPWM1, (uint32_t)EPWM1_MODULE, EPWM1P0_IRQn, 3, 500, {67, SYS_GPC_MFP2_PC9MFP_EPWM1_CH3  }}, //A0  PB13, 
-    {EPWM1, (uint32_t)EPWM1_MODULE, EPWM1P0_IRQn, 2, 500, { 7, SYS_GPC_MFP2_PC10MFP_EPWM1_CH2 }}, //A1  PB11, 
-    {EPWM1, (uint32_t)EPWM1_MODULE, EPWM1P0_IRQn, 1, 500, { 6, SYS_GPC_MFP2_PC11MFP_EPWM1_CH1 }}, //A2  PB10, 
-    {EPWM1, (uint32_t)EPWM1_MODULE, EPWM1P0_IRQn, 0, 500, { 5, SYS_GPC_MFP3_PC12MFP_EPWM1_CH0 }}, //A3  PB9, 
-    {EPWM0, (uint32_t)EPWM0_MODULE, EPWM0P0_IRQn, 3, 500, {100, SYS_GPE_MFP1_PE4MFP_EPWM0_CH3 }}, //A4  PB12, 
-    {EPWM0, (uint32_t)EPWM0_MODULE, EPWM0P0_IRQn, 2, 500, {99, SYS_GPE_MFP1_PE5MFP_EPWM0_CH2  }}, //A5  PA6, EPWM1_CH5
-	{EPWM0, (uint32_t)EPWM0_MODULE, EPWM0P0_IRQn, 2, 500, {99, SYS_GPE_MFP1_PE5MFP_EPWM0_CH2  }}, //A6  PA7, EPWM1_CH4
-	
-   
+    {(EPWM_T  *)(EPWM1), (uint32_t)EPWM1_MODULE, PWM_USE_EPWM, EPWM1P0_IRQn, PWM_CHANNEL_CH2, PWM_FREQUENCY_500HZ, {55, SYS_GPB_MFP3_PB13MFP_EPWM1_CH2}}, //D14  PB13,EPWM1_CH2 
+    {(EPWM_T  *)(BPWM1), (uint32_t)BPWM1_MODULE, PWM_USE_BPWM, BPWM1_IRQn,   PWM_CHANNEL_CH2, PWM_FREQUENCY_500HZ, {62, SYS_GPB_MFP2_PB9MFP_BPWM1_CH2 }}, //D17  PB9, BPWM1_CH2
+	{(EPWM_T  *)(EPWM0), (uint32_t)EPWM0_MODULE, PWM_USE_EPWM, EPWM0P0_IRQn, PWM_CHANNEL_CH5, PWM_FREQUENCY_500HZ, { 7, SYS_GPB_MFP0_PB0MFP_EPWM0_CH5 }}, //D0   PB0, EPWM0_CH5
+  
 };
 
 //[2025-02-25] ADC pins update done. 
@@ -180,9 +170,6 @@ ADCPinDescription ADC_Desc[] =
     {EADC0, EADC0_MODULE, ADC_CHANNEL_CH9,  { 62, SYS_GPB_MFP2_PB9MFP_EADC0_CH9   }},  //A3 PB9 (EADC_0CH9,  10b)
     {EADC0, EADC0_MODULE, ADC_CHANNEL_CH12, { 56, SYS_GPB_MFP3_PB12MFP_EADC0_CH12 }},  //A4 PB12(EADC0_CH12, 10b)
 	{EADC0, EADC0_MODULE, ADC_CHANNEL_CH0,  {  7, SYS_GPB_MFP0_PB0MFP_EADC0_CH0   }},  //A5 PB0 (EADC0_CH0,  10b) for test
-    
-	
-
 };
 //[2025-02-18] SPI0 pins updated
 SPIPinDescription SPI_Desc[] =
