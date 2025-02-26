@@ -196,6 +196,7 @@ extern UARTPinDescription UART_Desc[];
 #define UART_USE_UART1           (0x01)
 #define UART_USE_UART2           (0x02)
 #define UART_UAE_UART3           (0x03)
+#define UART_UAE_UART4           (0x04)
 #define UART_USE_VCOM            (0x0C)
 #define UART_USE_NOUSE           (0x0F)
 #define UART_CLKDIV_1            (0x01)
