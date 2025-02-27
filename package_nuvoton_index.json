@@ -10,13 +10,13 @@
                 {
                   "name": "UNO M467",
                   "architecture": "nuvoton",
-                  "version": "13.1.12",
+                  "version": "13.1.13",
 
                   "category": "Arduino",
                   "url": "https://github.com/stanlytw/__UNO_M467_dev/blob/master/Arduino_nuvoton.tar.bz2?raw=true",
                   "archiveFileName": "Arduino_nuvoton.tar.bz2",
-                  "checksum": "SHA-256:b093017e1c3d36a0184dbe7e14786ed628ee29a2f4f45b315f3d9778faf34cea",
-                  "size": "32132459",
+                  "checksum": "SHA-256:42e973fe773a8ac60926ee226969dbc7205d237028f650a3fc0c31442abda09c",
+                  "size": "32774303",
                   "boards": [
                     {"name": "NuMaker-M467HJ"},
                     {"name": "Customized-M467M"}
