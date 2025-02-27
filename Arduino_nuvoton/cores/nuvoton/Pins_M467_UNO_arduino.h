@@ -188,7 +188,7 @@ do { \
 }while(0);
 
 /*========== UART definition ==========*/
-#define UART_MAX_COUNT 1//Test GPIO 3 //__M467SJHN__
+#define UART_MAX_COUNT 2//Test GPIO 3 //__M467SJHN__
 extern UARTPinDescription UART_Desc[];
 #define UART_RX 0
 #define UART_TX 1
