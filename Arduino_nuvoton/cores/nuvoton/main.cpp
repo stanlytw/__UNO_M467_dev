@@ -51,6 +51,10 @@ int main( void )
 	#if defined(__M451__) || defined(__NUC240__) || defined(__NANO100__)
     USBDevice.attach();
 	#endif
+	
+	#if defined(__M460MINIMA__)
+	Serial.begin(115200);//[2025-03-03]Turn on VCOM
+	#endif
 
 	setup();
 

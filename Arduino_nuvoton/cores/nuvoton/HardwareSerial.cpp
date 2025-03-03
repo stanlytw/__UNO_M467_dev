@@ -260,6 +260,8 @@ void HardwareSerial::end(void)
 {
     if(u32ModuleNum == UART_USE_VCOM)
     {
+		this->vcom_init_done = 0;//[2025-03-03]To hook VCOM in before setup function. Default baud is 115200.
+		                         //in case someone want to change baudrate. Call end, then do begin(default_BR)   
 		return;
 	}
     else if(u32ModuleNum == UART_USE_NOUSE)
