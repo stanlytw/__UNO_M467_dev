@@ -84,6 +84,7 @@ public:
 #endif
     /* Set up/tear down */
     void begin(uint32_t baud);
+	void begin(uint32_t baud, uint16_t config);
     void end(void);
 
     /* I/O */
@@ -109,6 +110,7 @@ private:
     uint32_t vcom_init_done;
     uint32_t use_vcom;
 	uint32_t u32ModuleNum;
+	uint16_t u16config = 0x00 ;//RS485 over Serial
 };
 
 #if(UART_MAX_COUNT>0)

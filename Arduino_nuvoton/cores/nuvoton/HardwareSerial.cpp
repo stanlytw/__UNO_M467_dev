@@ -171,6 +171,15 @@ HardwareSerial::HardwareSerial(VCOM_T *vcom_device, uint32_t u32ModuleNum, ring_
 /*
  * Set up/tear down
  */
+//For RS485 support
+void HardwareSerial::begin(uint32_t baud, uint16_t config)
+{
+	
+	this->u16config = config;
+	begin(baud);
+} 
+ 
+ 
 void HardwareSerial::begin(uint32_t baud)
 {
 
@@ -194,6 +203,11 @@ void HardwareSerial::begin(uint32_t baud)
 	{
 		//u32ModuleNum = UART_USE_UART0, UART_USE_UART1... etc
        UART_Config(UART_Desc[u32Idx]);
+	   
+	   //RS485-AUD
+	   if(u16config==RS485_OVER_SERIAL)
+		   DE_Config(DEPin_Desc[u32Idx]);
+	   
        SYS_UnlockReg();		
 	}
 	
@@ -217,7 +231,7 @@ void HardwareSerial::begin(uint32_t baud)
 	}
 	else if(uart_device == UART4)
 	{	
-        //CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART4(u32ClkDiv));
+        CLK_SetModuleClock(UART_Desc[u32Idx].module, u32ClkSrc, CLK_CLKDIV4_UART4(u32ClkDiv));
 	}   
 	/* Reset IP */
     //SYS_ResetModule(UART_Desc[u32Idx].module);
@@ -227,7 +241,15 @@ void HardwareSerial::begin(uint32_t baud)
     NVIC_EnableIRQ(u32IrqId);
 
     /* Configure UART and set UART Baudrate */
-    UART_Open(uart_device, baud);
+    UART_Open(uart_device, baud);   
+	
+	if(u16config==RS485_OVER_SERIAL)
+	{
+        UART_SelectRS485Mode(uart_device, UART_ALTCTL_RS485AUD_Msk, 0);		
+		/* Set RTS pin active level as high level active */
+        uart_device->MODEM = (uart_device->MODEM & (~UART_MODEM_RTSACTLV_Msk)) | UART_RTS_IS_HIGH_LEV_ACTIVE;
+	}
+	    
 
 #endif//#if defined(__M451__)
     SYS_LockReg();

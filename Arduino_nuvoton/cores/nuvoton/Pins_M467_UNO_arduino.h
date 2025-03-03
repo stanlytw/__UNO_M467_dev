@@ -190,6 +190,7 @@ do { \
 /*========== UART definition ==========*/
 #define UART_MAX_COUNT 2//Test GPIO 3 //__M467SJHN__
 extern UARTPinDescription UART_Desc[];
+extern PinType DEPin_Desc[];
 #define UART_RX 0
 #define UART_TX 1
 #define UART_USE_UART0           (0x00)
@@ -205,12 +206,22 @@ extern UARTPinDescription UART_Desc[];
 #define UART_DESC_IDX1           (0x01)
 #define UART_DESC_IDX2           (0x02)
 
+#define RS485_OVER_SERIAL        (0x85)
+
 #define UART_Config(Desc) \
 do { \
     uint8_t i; \
     for(i=0;i<(2);i++) \
         outp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP) & ~GPIO_Desc[Desc.pintype[i].num].Pin.Mask) | Desc.pintype[i].type); \
 }while(0);
+
+#define DE_Config(Desc) \
+do { \
+    uint8_t i; \
+    for(i=0;i<(1);i++) \
+        outp32(GPIO_Desc[Desc.num].Pin.MFP,(inp32(GPIO_Desc[Desc.num].Pin.MFP) & ~GPIO_Desc[Desc.num].Pin.Mask) | Desc.type); \
+}while(0);
+
 
 /*========== I2C definition ==========*/
 #define I2C_MAX_COUNT 2

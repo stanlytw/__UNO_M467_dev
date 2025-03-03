@@ -198,11 +198,26 @@ UARTPinDescription UART_Desc[] =
 	
 };
 
+//[2025-03-03] RS485 AUD
+//nRTS(DE) Pin assignment
+PinType DEPin_Desc[] = 
+{
+	{-1 , SYS_GPC_MFP1_PC6MFP_UART0_nRTS},//VCOM,  dummy, UART0_nRTS
+	{19 , SYS_GPC_MFP1_PC6MFP_UART0_nRTS},//UART0, PC6,   UART0_nRTS
+    /*Left for other DE pin resource*/
+	
+};
+
+
 //[2025-02-18] I2C pins updated
 I2CPinDescription I2C_Desc[] =
 {
     {I2C1, I2C1_MODULE, {{33 , SYS_GPF_MFP0_PF0MFP_I2C1_SCL}, {34 , SYS_GPF_MFP0_PF1MFP_I2C1_SDA }}},
 	{I2C2, I2C2_MODULE, {{29 , SYS_GPA_MFP0_PA1MFP_I2C2_SCL}, {30 , SYS_GPA_MFP0_PA0MFP_I2C2_SDA }}},
 };
+
+
+
+
 
 #endif//__UNO_M467__
