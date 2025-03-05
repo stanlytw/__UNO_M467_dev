@@ -838,6 +838,7 @@ void HID_RebootCmdhandler(void)
 	    /* Write magic number to spare register */
         RTC_WRITE_SPARE_REGISTER(0, 0x55);
 				  
+        SYS_UnlockReg();//[2025-03-05] In case it is locked by other peripherals
         FMC_SetVectorPageAddr(FMC_LDROM_BASE);
         SYS_LockReg(); 
         /* Software reset to boot to LDROM */

@@ -25,89 +25,7 @@
  *****************************************************************************/
 
 #include "HardwareTimer.h"
-#if defined(__M451__)
-	#if(NR_TIMERS>0)
-		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0SEL_HXT);
-	#endif
-	#if(NR_TIMERS>1)
-		HardwareTimer Timer2(1,TMR1_MODULE,CLK_CLKSEL1_TMR1SEL_HXT);
-	#endif
-	#if(NR_TIMERS>2)
-		HardwareTimer Timer3(2,TMR2_MODULE,CLK_CLKSEL1_TMR2SEL_HXT);
-	#endif
-	#if(NR_TIMERS>3)
-		HardwareTimer Timer4(3,TMR3_MODULE,CLK_CLKSEL1_TMR3SEL_HXT);
-	#endif
-	
-#elif defined(__NUC240__)
-	#if(NR_TIMERS>0)
-		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0_S_HXT);
-	#endif
-	#if(NR_TIMERS>1)
-		HardwareTimer Timer2(1,TMR1_MODULE,CLK_CLKSEL1_TMR1_S_HXT);
-	#endif
-	#if(NR_TIMERS>2)
-		HardwareTimer Timer3(2,TMR2_MODULE,CLK_CLKSEL1_TMR2_S_HXT);
-	#endif
-	#if(NR_TIMERS>3)
-		HardwareTimer Timer4(3,TMR3_MODULE,CLK_CLKSEL1_TMR3_S_HXT);
-	#endif
-
-#elif defined(__NANO100__) | defined(__NANO1X2__) 
-	#if(NR_TIMERS>0)
-		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0_S_HXT);
-	#endif
-	#if(NR_TIMERS>1)
-		HardwareTimer Timer2(1,TMR1_MODULE,CLK_CLKSEL1_TMR1_S_HXT);
-	#endif
-	#if(NR_TIMERS>2)
-		HardwareTimer Timer3(2,TMR2_MODULE,CLK_CLKSEL2_TMR2_S_HXT);
-	#endif
-	#if(NR_TIMERS>3)
-		HardwareTimer Timer4(3,TMR3_MODULE,CLK_CLKSEL2_TMR3_S_HXT);
-	#endif
-
-#elif defined(__NUC131__)
-	#if(NR_TIMERS>0)
-		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0_S_HXT);
-	#endif
-	#if(NR_TIMERS>1)
-		HardwareTimer Timer2(1,TMR1_MODULE,CLK_CLKSEL1_TMR1_S_HXT);
-	#endif
-	#if(NR_TIMERS>2)
-		HardwareTimer Timer3(2,TMR2_MODULE,CLK_CLKSEL1_TMR2_S_HXT);
-	#endif
-	#if(NR_TIMERS>3)
-		HardwareTimer Timer4(3,TMR3_MODULE,CLK_CLKSEL1_TMR3_S_HXT);
-	#endif
-
-#elif  defined(__M032BT__) ||defined(__M032KG__) 
-	#if(NR_TIMERS>0)
-		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0SEL_PCLK0);
-	#endif
-	#if(NR_TIMERS>1)
-		HardwareTimer Timer2(1,TMR1_MODULE,CLK_CLKSEL1_TMR1SEL_PCLK0);
-	#endif
-	#if(NR_TIMERS>2)
-		HardwareTimer Timer3(2,TMR2_MODULE,CLK_CLKSEL1_TMR2SEL_PCLK1);
-	#endif
-	#if(NR_TIMERS>3)
-		HardwareTimer Timer4(3,TMR3_MODULE,CLK_CLKSEL1_TMR3SEL_PCLK1);
-	#endif
-#elif  defined(__M252__)
-	#if(NR_TIMERS>0)
-		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0SEL_HIRC);
-	#endif
-	#if(NR_TIMERS>1)
-		HardwareTimer Timer2(1,TMR1_MODULE,CLK_CLKSEL1_TMR1SEL_HIRC);
-	#endif
-	#if(NR_TIMERS>2)
-		HardwareTimer Timer3(2,TMR2_MODULE,CLK_CLKSEL1_TMR2SEL_HIRC);
-	#endif
-	#if(NR_TIMERS>3)
-		HardwareTimer Timer4(3,TMR3_MODULE,CLK_CLKSEL1_TMR3SEL_HIRC);
-	#endif
-#elif  defined(__M480__) || defined(__M460__)
+#if defined(__M480__) || defined(__M460__)
 	#if(NR_TIMERS>0)
 		HardwareTimer Timer1(0,TMR0_MODULE,CLK_CLKSEL1_TMR0SEL_HIRC);
 	#endif
@@ -239,8 +157,9 @@ void HardwareTimer::clearIntFlag(){
 }
 
 /* -- Deprecated predefined instances -------------------------------------- */
+#if(NR_TIMERS>0)
 uint8_t TimerEnabled[NR_TIMERS]={0};
-
+#endif
 #if 0
 HardwareTimer* GetHardwareTimer(void)
 {

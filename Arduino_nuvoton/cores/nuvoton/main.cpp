@@ -35,23 +35,8 @@ void __attribute__((weak)) setup(void)
 int main( void )
 {
 
-#if ENABLE_C_PRINTF && (defined(__M032BT__) |defined(__M032KG__) )
-  SYS_UnlockReg();
-  
-  CLK_EnableModuleClock(UART0_MODULE);
-  CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART0SEL_HIRC, CLK_CLKDIV0_UART0(1));
-  SYS->GPA_MFPL = (SYS->GPA_MFPL & ~(SYS_GPA_MFPL_PA0MFP_Msk | SYS_GPA_MFPL_PA1MFP_Msk))    |       \
-                    (SYS_GPA_MFPL_PA0MFP_UART0_RXD | SYS_GPA_MFPL_PA1MFP_UART0_TXD);
-  SYS_LockReg();
-  UART_Open(UART0, 115200);
-#endif
-
 	init();	//nuvoton board init
 
-	#if defined(__M451__) || defined(__NUC240__) || defined(__NANO100__)
-    USBDevice.attach();
-	#endif
-	
 	#if defined(__M460MINIMA__)
 	Serial.begin(115200);//[2025-03-03]Turn on VCOM
 	#endif
