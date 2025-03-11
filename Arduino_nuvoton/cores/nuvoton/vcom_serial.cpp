@@ -653,7 +653,7 @@ void VCOM_ClassRequest(void)
 
                 /* UART setting */
                 if((gUsbCmd.wIndex & 0xff) == 0)  /* VCOM-1 */
-                    VCOM_LineCoding(0);
+                    //VCOM_LineCoding(0);
                 break;
             }
             case SET_PROTOCOL://hid

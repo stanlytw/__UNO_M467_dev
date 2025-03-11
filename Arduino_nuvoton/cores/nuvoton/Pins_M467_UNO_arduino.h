@@ -188,7 +188,7 @@ do { \
 }while(0);
 
 /*========== UART definition ==========*/
-#define UART_MAX_COUNT 2//Test GPIO 3 //__M467SJHN__
+#define UART_MAX_COUNT 3//Test GPIO 3 //__M467SJHN__
 extern UARTPinDescription UART_Desc[];
 extern PinType DEPin_Desc[];
 #define UART_RX 0
@@ -224,7 +224,7 @@ do { \
 
 
 /*========== I2C definition ==========*/
-#define I2C_MAX_COUNT 2
+#define I2C_MAX_COUNT 1
 
 extern I2CPinDescription I2C_Desc[];
 #define I2C_SDA 0

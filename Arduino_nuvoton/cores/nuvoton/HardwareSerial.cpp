@@ -88,6 +88,10 @@ void UART0_IRQHandler(void)
             rx_buffer1.buffer[rx_buffer1.head] = UART0->DAT;
             rx_buffer1.head = i;
         }
+		else//i == rx_buffer1.tail
+		{
+			unsigned char dummy = UART0->DAT;
+		}
     }
 
 }
@@ -104,6 +108,10 @@ void UART1_IRQHandler(void)
             rx_buffer2.buffer[rx_buffer2.head] = UART1->DAT;
             rx_buffer2.head = i;
         }
+		else//i == rx_buffer1.tail
+		{
+			unsigned char dummy = UART1->DAT;
+		}
     }
 
 }
@@ -128,6 +136,12 @@ void UART1_IRQHandler(void)
     void serial1Event() __attribute__((weak));
 #endif
 
+#if defined(__M467SJHAN__)
+#if(UART_MAX_COUNT>2)
+  void serial2Event() __attribute__((weak));
+#endif
+#endif//defined(__M467SJHAN__)
+
 void serialEventRun(void)
 {
 #if(UART_MAX_COUNT>0)
@@ -137,6 +151,12 @@ void serialEventRun(void)
 #if(UART_MAX_COUNT>1)
     if (Serial1.available()) serial1Event();
 #endif
+
+#if defined(__M467SJHAN__)
+#if(UART_MAX_COUNT>2)
+   if (Serial2.available()) serial2Event();
+#endif
+#endif//defined(__M467SJHAN__)
 }
 
 HardwareSerial::HardwareSerial(UART_T *uart_device,

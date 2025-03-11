@@ -41,7 +41,7 @@
 #endif
 
 
-#define SERIAL_BUFFER_SIZE 16
+#define SERIAL_BUFFER_SIZE 256
 #if defined(__M460MINIMA__)
 //#include "vcom_serial.h"
 #define VCOM_T        HSUSBD_T
@@ -126,7 +126,7 @@ extern void serial1EventRun(void) __attribute__((weak));
 #if defined(__M467SJHAN__)
 #if(UART_MAX_COUNT>2)
 extern HardwareSerial Serial2;
-extern void serial1EventRun(void) __attribute__((weak));
+extern void serial2EventRun(void) __attribute__((weak));
 #endif
 #endif//defined(__M467SJHAN__)
 
