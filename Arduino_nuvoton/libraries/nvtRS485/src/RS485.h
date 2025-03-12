@@ -21,12 +21,12 @@
 #define _RS485_H_INCLUDED
 
 #include <Arduino.h>
+//Nuvoton Defines
 #define RS485_SERIAL_PORT Serial1
 #define RS485_DEFAULT_TX_PIN D0 //PA6
-#define RS485_DEFAULT_DE_PIN D2
-#define RS485_DEFAULT_RE_PIN D9
-
-
+#define RS485_DEFAULT_DE_PIN D14
+#define RS485_DEFAULT_RE_PIN D15
+#define ORIGINAL_VER//with config
 
 #ifndef RS485_DEFAULT_TX_PIN
 #ifdef PIN_SERIAL1_TX

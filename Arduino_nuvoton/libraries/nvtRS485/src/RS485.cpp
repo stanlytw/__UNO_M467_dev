@@ -44,17 +44,17 @@ static void nvt_delayMicroseconds(uint32_t usec)
 	int nn;
 	for(nn=0; nn<usec; nn++)
 		micros();
-	
+	return;
 }
 
 void RS485Class::begin(unsigned long baudrate)
 {
-  begin(baudrate, 0, RS485_DEFAULT_PRE_DELAY, RS485_DEFAULT_POST_DELAY);
+  begin(baudrate, RS485_OVER_SERIAL, RS485_DEFAULT_PRE_DELAY, RS485_DEFAULT_POST_DELAY);
 }
 
 void RS485Class::begin(unsigned long baudrate, int predelay, int postdelay)
 {
-  begin(baudrate, 0, predelay, postdelay);
+  begin(baudrate, RS485_OVER_SERIAL, predelay, postdelay);
 }
 
 void RS485Class::begin(unsigned long baudrate, uint16_t config)
@@ -70,7 +70,7 @@ void RS485Class::begin(unsigned long baudrate, uint16_t config, int predelay, in
   // Set only if not already initialized with ::setDelays
   _predelay = _predelay == 0 ? predelay : _predelay;
   _postdelay = _postdelay == 0 ? postdelay : _postdelay;
-
+  
   if (_dePin > -1) {
     pinMode(_dePin, OUTPUT);
     digitalWrite(_dePin, LOW);
@@ -136,12 +136,13 @@ void RS485Class::flush()
 
 size_t RS485Class::write(uint8_t b)
 {
+  size_t ret;
   if (!_transmisionBegun) {
     setWriteError();
     return 0;
   }
-
   return _serial->write(b);
+ 
 }
 
 RS485Class::operator bool()
@@ -153,7 +154,9 @@ void RS485Class::beginTransmission()
 {
   if (_dePin > -1) {
     digitalWrite(_dePin, HIGH);
+#ifdef SET_DERE_WITH_DELAY	
     if (_predelay) nvt_delayMicroseconds(_predelay);
+#endif
   }
 
   _transmisionBegun = true;
@@ -164,7 +167,9 @@ void RS485Class::endTransmission()
   _serial->flush();
 
   if (_dePin > -1) {
+#ifdef SET_DERE_WITH_DELAY		  
     if (_postdelay) nvt_delayMicroseconds(_predelay);
+#endif	
     digitalWrite(_dePin, LOW);
   }
 
@@ -191,9 +196,11 @@ void RS485Class::sendBreak(unsigned int duration)
   _serial->end();
   pinMode(_txPin, OUTPUT);
   digitalWrite(_txPin, LOW);
+#ifdef SET_DERE_WITH_DELAY	
   delay(duration);
+#endif  
 #ifdef ORIGINAL_VER  
-  _serial->begin(_baudrate, config);
+  _serial->begin(_baudrate, _config);
 #else
   _serial->begin(_baudrate);
 #endif 
@@ -205,10 +212,12 @@ void RS485Class::sendBreakMicroseconds(unsigned int duration)
   _serial->end();
   pinMode(_txPin, OUTPUT);
   digitalWrite(_txPin, LOW);
+#ifdef SET_DERE_WITH_DELAY	  
   delay(duration);
-  
+#endif 
+ 
 #ifdef ORIGINAL_VER  
-  _serial->begin(_baudrate, config);
+  _serial->begin(_baudrate, _config);
 #else
   _serial->begin(_baudrate);
 #endif 
