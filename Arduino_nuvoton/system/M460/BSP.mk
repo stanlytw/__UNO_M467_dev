@@ -14,7 +14,7 @@
 
 CHIP=M460
 ARM_GCC_TOOLCHAIN=C:/Users/HLLIN6/AppData/Local/Arduino15/packages/arduino/tools/arm-none-eabi-gcc/7-2017q4/bin
-PROJECT_BASE_PATH=C:/Users/HLLIN6/AppData/Local/Arduino15/packages/nuvoton/hardware/nuvoton/3.0.5/system/$(CHIP)
+PROJECT_BASE_PATH=C:/Users/HLLIN6/AppData/Local/Arduino15/packages/nuvoton/hardware/nuvoton/13.1.18/system/$(CHIP)
 CORE=cortex-m4
 
 OUTPUT_BIN=./
