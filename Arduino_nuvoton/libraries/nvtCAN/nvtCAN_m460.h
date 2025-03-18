@@ -1,7 +1,7 @@
 /**************************************************************************//**
- * @file     nvtCAN.h
+ * @file     nvtCAN_m460.h
  * @version  V1.00
- * @brief    NUC131 Series of Arduino CAN Library Header File
+ * @brief    M4 Series of Arduino CAN Library Header File
  *
  * @note
  * SPDX-License-Identifier: Apache-2.0
@@ -9,15 +9,15 @@
  * Copyright (C) 2023 Nuvoton Technology Corp. All rights reserved.
  *
  ******************************************************************************/
-#ifndef _NVTCAN_H_
-#define _NVTCAN_H_
+#ifndef _NVTCAN_M460_H_
+#define _NVTCAN_M460_H_
 
 
 
 #include "Arduino.h"
 #include "Pins_arduino.h"
 #include "mcp_can.h"
-#include "nvtCAN_dfs.h"
+#include "nvtCAN_dfs_m460.h"
 
 typedef struct _RxMsgAndMskType
 {
@@ -29,11 +29,11 @@ typedef struct _RxMsgAndMskType
 
 #define MAX_CHAR_IN_MESSAGE 8
 #define NVT_MAXFILTER_NUM 6
-class nvtCAN 
+class nvtCAN_m460
 {
 public:
     
-    nvtCAN(byte _CANSEL);
+    nvtCAN_m460(byte _CANSEL);
     
 public:
     /*CAN operator function*/
@@ -75,7 +75,7 @@ private:
 public:    
     RxMsgAndMskType rxMsgAMsk[NVT_MAXFILTER_NUM];
     /*functions to access static member data*/
-    static STR_CANMSG_T* getrxCANMsgPtr() { return &(rxCANMsg); }
+    static CANFD_FD_MSG_T* getrxCANMsgPtr() { return &(rxCANMsg); }
     static void setg32IIDRStatus(uint32_t val) { g32IIDRStatus = val; }
    
 
@@ -83,7 +83,7 @@ private:
     byte nReservedTx; // Count of tx buffers for reserved send
     union{
         void *_vncan;
-        CAN_T *ncan;
+        CANFD_T *ncan;
     };
     uint32_t module;
     uint32_t opmode;
@@ -95,7 +95,7 @@ private:
     byte rtr;               // is remote frame
 	
     /*static member data*/
-    static STR_CANMSG_T rxCANMsg;
+    static CANFD_FD_MSG_T rxCANMsg;
     static uint32_t g32IIDRStatus;
     
 };
@@ -105,7 +105,8 @@ extern "C" {
 #endif
 byte BaudRateCheck(uint32_t u32BaudRate, uint32_t u32RealBaudRate);
 uint32_t BaudRateSelector(uint32_t u32mcpBaudRate);
-static void CAN_0_Init(void);
+static void CANFD_0_Init(void);
+static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint32_t u32dataBitRate ); 
 static interruptCB callbackCAN0;
 void attachInterruptCAN(void (*callback)(void));
 #ifdef __cplusplus

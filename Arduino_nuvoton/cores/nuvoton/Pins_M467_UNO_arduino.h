@@ -93,6 +93,18 @@ typedef struct _I2CPinDescription
 } I2CPinDescription;
 
 
+typedef struct _CANFDPinDescription
+{
+    CANFD_T *CFD;
+    uint32_t module;
+	uint32_t  modulenum;
+    IRQn_Type irq;
+    PinType pintype[2];
+    //uint32_t clksrcsel;
+    //uint32_t clkdiv;
+} CANFDPinDescription;
+
+
 typedef struct _BoardToPin
 {
     int32_t pin;

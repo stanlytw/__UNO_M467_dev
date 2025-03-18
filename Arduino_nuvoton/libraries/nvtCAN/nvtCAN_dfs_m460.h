@@ -13,7 +13,7 @@
 #define _NVTCANDFS_H_
 
 #include <Arduino.h>
-#include <nvtCAN.h>
+#include <nvtCAN_m460.h>
 #include <inttypes.h>
 
 
@@ -41,6 +41,8 @@
 #define CAN_BAUDRATE_10K       (uint32_t)(10000)
 #define CAN_BAUDRATE_5K        (uint32_t)(5000)
 #define CAN_BAUDRATE_NO        (uint32_t)(0)
+
+
 
 //Macros used in nvtCAN library
 #define STD_ID 0

@@ -52,6 +52,7 @@ typedef struct _EPWMPinDescription
 {
     EPWM_T  *P;
     uint32_t module;
+	uint32_t moduletype;
     IRQn_Type irq;
     uint32_t ch;
     uint32_t freq;
@@ -76,9 +77,11 @@ typedef struct _UARTPinDescription
 {
     UART_T *U;
     uint32_t module;
+	uint32_t  modulenum;
     IRQn_Type irq;
     PinType pintype[2];
     uint32_t clksrcsel;
+    uint32_t clkdiv;
 } UARTPinDescription;
 
 typedef struct _I2CPinDescription
@@ -88,6 +91,16 @@ typedef struct _I2CPinDescription
     PinType pintype[2];
 } I2CPinDescription;
 
+typedef struct _CANFDPinDescription
+{
+    CANFD_T *CFD;
+    uint32_t module;
+	uint32_t  modulenum;
+    IRQn_Type irq;
+    PinType pintype[2];
+    //uint32_t clksrcsel;
+    //uint32_t clkdiv;
+} CANFDPinDescription;
 
 typedef struct _BoardToPin
 {
@@ -117,7 +130,20 @@ extern GPIOPinDescription GPIO_Desc[];
 #define GPIO_Config(Desc) outp32(Desc.Pin.MFP,(inp32(Desc.Pin.MFP) & ~Desc.Pin.Mask) | Desc.Pin.Type)
 
 /*========== PWM definition ==========*/
-#define PWM_MAX_COUNT 8
+#define PWM_MAX_COUNT 1
+#define PWM_USE_BPWM              (0xE0)
+#define PWM_USE_EPWM              (0xE1)
+#define PWM_CHANNEL_CH0           (0x00)
+#define PWM_CHANNEL_CH1           (0x01)
+#define PWM_CHANNEL_CH2           (0x02)
+#define PWM_CHANNEL_CH3           (0x03)
+#define PWM_CHANNEL_CH4           (0x04)
+#define PWM_CHANNEL_CH5           (0x05)
+#define PWM_FREQUENCY_500HZ       (500)
+#define PWM_DESC_IDX0             (0x00)
+#define PWM_DESC_IDX1             (0x01)
+#define PWM_DESC_IDX2             (0x02)
+#define PWM_DESC_IDX_NOUSE        (0xF0)
 extern EPWMPinDescription PWM_Desc[];
 #define PWM_Config(Desc) outp32(GPIO_Desc[Desc.pintype.num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype.num].Pin.MFP) & ~GPIO_Desc[Desc.pintype.num].Pin.Mask) | Desc.pintype.type);
 
@@ -147,13 +173,35 @@ do { \
 /*========== UART definition ==========*/
 #define UART_MAX_COUNT 2
 extern UARTPinDescription UART_Desc[];
+extern PinType DEPin_Desc[];
 #define UART_RX 0
 #define UART_TX 1
+#define UART_USE_UART0           (0x00)
+#define UART_USE_UART1           (0x01)
+#define UART_USE_UART2           (0x02)
+#define UART_USE_UART3           (0x03)
+#define UART_USE_UART4           (0x04)
+#define UART_USE_VCOM            (0x0C)
+#define UART_USE_NOUSE           (0x0F)
+#define UART_CLKDIV_1            (0x01)
+#define UART_CLKDIV_2            (0x02)
+#define UART_DESC_IDX0           (0x00)
+#define UART_DESC_IDX1           (0x01)
+#define UART_DESC_IDX2           (0x02)
+
+#define RS485_OVER_SERIAL        (0x85)
 #define UART_Config(Desc) \
 do { \
     uint8_t i; \
     for(i=0;i<2;i++) \
         outp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP) & ~GPIO_Desc[Desc.pintype[i].num].Pin.Mask) | Desc.pintype[i].type); \
+}while(0);
+
+#define DE_Config(Desc) \
+do { \
+    uint8_t i; \
+    for(i=0;i<(1);i++) \
+        outp32(GPIO_Desc[Desc.num].Pin.MFP,(inp32(GPIO_Desc[Desc.num].Pin.MFP) & ~GPIO_Desc[Desc.num].Pin.Mask) | Desc.type); \
 }while(0);
 
 /*========== I2C definition ==========*/
@@ -168,6 +216,22 @@ do { \
     for(i=0;i<2;i++) \
         outp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP) & ~GPIO_Desc[Desc.pintype[i].num].Pin.Mask) | Desc.pintype[i].type); \
 }while(0);
+
+/*========== CANFD definition ==========*/
+#define CANFD_MAX_COUNT 1
+extern CANFDPinDescription CANFD_Desc[];
+#define CANFD_CLKDIV_1           (0x01)
+#define CANFD_USE_CANFD0         (0x00)
+#define CANFD_USE_CANFD1         (0x01)
+
+#define CANFD_Config(Desc) \
+do { \
+    uint8_t i; \
+    for(i=0;i<2;i++) \
+        outp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP) & ~GPIO_Desc[Desc.pintype[i].num].Pin.Mask) | Desc.pintype[i].type); \
+}while(0);
+
+
 
 /*========== Arduino PIN mapping definition ==========*/
 static const uint8_t SS   = 41;

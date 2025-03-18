@@ -57,6 +57,7 @@ void Enable_All_IPs(void)
     CLK_EnableModuleClock(GPD_MODULE);//[2024-11-06]For SDH
     CLK_EnableModuleClock(GPE_MODULE);//[2024-11-06]For SDH
     CLK_EnableModuleClock(GPG_MODULE);
+	CLK_EnableModuleClock(GPJ_MODULE);//[2025-03-17]For CANFD on Numaker-IOT-M467, PJ10, PJ11
 #endif
 
     CLK_SetModuleClock(EPWM0_MODULE, CLK_CLKSEL2_EPWM0SEL_PCLK0, 0);
@@ -70,6 +71,18 @@ void Enable_All_IPs(void)
     //[2024-11-06]Since no wrap for sdh, enable ip clock here.
     CLK_EnableModuleClock(SDH0_MODULE);
     CLK_SetModuleClock(SDH0_MODULE, CLK_CLKSEL0_SDH0SEL_HCLK, CLK_CLKDIV0_SDH0(4));
+	
+	
+	/* Enable CANFD module clock source and proper divide by 1, ref Std sample code */
+	/* CANFD Pin Configuarion left in NVT CAN library*/
+    //[2024-11-06]Since to compatible to mcp_can class, enable ip clock here.
+	//Default use CAN FD0
+	//To do: If multi-CANFD mocule are required, add them here.
+	 /* Select CAN FD0 clock source is HCLK */
+    CLK_SetModuleClock(CANFD0_MODULE, CLK_CLKSEL0_CANFD0SEL_HCLK, CLK_CLKDIV5_CANFD0(1));
+    /* Enable CAN FD0 peripheral clock */
+    CLK_EnableModuleClock(CANFD0_MODULE);
+    
 
     /* SD0 Pin define for M467SJ */
 #if defined(__M467SJHAN__)
