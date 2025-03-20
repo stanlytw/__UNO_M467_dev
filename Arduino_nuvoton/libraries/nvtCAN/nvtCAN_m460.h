@@ -37,8 +37,17 @@ public:
     
 public:
     /*CAN operator function*/
-    byte begin(uint32_t speedset, const byte clockset = MCP_16MHz);
-    byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode);                                                                              
+    byte begin(uint32_t speedset);
+    byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode);  
+
+	byte setMode(uint32_t opmode);
+	byte getMode(void)             { return canmode;        }
+	
+	uint32_t getSetSpeed(void)     { return canspeed_set;   }
+	uint32_t getNormalSpeed(void)  { return normalspeed_set;}
+    uint32_t getDataSpeed(void)    { return dataspeed_set;  } 
+    
+	
     byte init_Mask(byte num, byte ext, unsigned long ulData);                                                                                   // init Masks
     byte init_Filt(byte num, byte ext, unsigned long ulData);                                                                                   // init filters
    
@@ -60,6 +69,8 @@ public:
     byte sendMsgBuf(unsigned long id, byte ext, byte len, volatile const byte *buf);
     byte sendMsgBuf(unsigned long id, byte ext, byte len, volatile const byte* buf, uint8_t is_fd);
 	
+	uint32_t BaudRateSelector(uint32_t u32mcpBaudRate);
+	byte BaudRateParser(uint32_t u32mcpBaudRate);
 	
 private:
     /*Nuvoton CAN controller(ccan) driver function */
@@ -90,8 +101,12 @@ private:
     uint32_t module;
     uint32_t opmode;
 	uint32_t canmode;
-    uint32_t canspeed_set;
-    byte nCANSel;
+	
+    uint32_t canspeed_set = 0;
+	uint32_t normalspeed_set = 0;
+	uint32_t dataspeed_set = 0;
+    
+	byte nCANSel;
     IRQn_Type id;
     byte ext_flg; 			// identifier xxxID, either extended (the 29 LSB) or standard (the 11 LSB)
     unsigned long can_id;   // can id
@@ -107,7 +122,7 @@ private:
 extern "C" {
 #endif
 byte BaudRateCheck(uint32_t u32BaudRate, uint32_t u32RealBaudRate);
-uint32_t BaudRateSelector(uint32_t u32mcpBaudRate);
+
 static void CANFD_0_Init(void);
 static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint32_t u32dataBitRate ); 
 static interruptCB callbackCAN0;
