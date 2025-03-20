@@ -17,8 +17,7 @@
 */
 
 #include "WInterrupts.h"
-#if defined(__M451__) || (__M252__) || (__M480__)
-
+#if defined (__M460__)
 typedef void (*interruptCB)(void);
 #define GNUM 16
 static interruptCB callbacksGPA[GNUM];
@@ -28,19 +27,19 @@ static interruptCB callbacksGPD[GNUM];
 static interruptCB callbacksGPE[GNUM];
 static interruptCB callbacksGPF[GNUM];
 
-#if defined(__M252__) || (__M480__)
 /* for software serial */
 uint8_t g_u8Softserail_enable=0;
 uint8_t g_u8Softserail_port_num;
 uint8_t g_u8Softserail_pin_num;
 static interruptCB pfn_software_uart_handler = NULL;
 GPIO_T* g_u8Softserail_port_base;
-#endif
 
 /* Configure GPIO interrupt sources */
-static void __initialize() {
+static void __initialize() 
+{
 	int i;
-	for (i=0; i<GNUM; i++) {
+	for (i=0; i<GNUM; i++) 
+	{
 		callbacksGPA[i] = NULL;
 		callbacksGPB[i] = NULL;
 		callbacksGPC[i] = NULL;
@@ -48,6 +47,7 @@ static void __initialize() {
 		callbacksGPE[i] = NULL;
 		callbacksGPF[i] = NULL;
 	}
+	
 	NVIC_EnableIRQ(GPA_IRQn);
 	NVIC_EnableIRQ(GPB_IRQn);
 	NVIC_EnableIRQ(GPC_IRQn);
@@ -64,8 +64,8 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 	if(pin > BoardToPin_MAX_COUNT) return;
 	pin=BoardToPinInfo[pin].pin;
 #else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
- #endif
+    if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
+#endif
   		
 	if (!enabled) {
 		__initialize();
@@ -79,7 +79,7 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 	
 	for (t = mask; t>1; t>>=1, pos++);
 
-#if defined(__M252__) || (__M480__)
+
     /*special mode for Softserial*/
     if(   (g_u8Softserail_enable)
         &&(pio == g_u8Softserail_port_base) 
@@ -88,7 +88,7 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
         pfn_software_uart_handler = callback;
         
     } else { //origin path
-#endif
+
 
 	// Set callback function
 	
@@ -103,29 +103,37 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 	else if (pio == PE )
 		callbacksGPE[pos] = callback;
 	else if (pio == PF )
-		callbacksGPF[pos] = callback;		
-#if defined(__M252__)|| (__M480__)
+		callbacksGPF[pos] = callback;
+	
+
 	}
-#endif
+
 
 	// Enable interrupt
-	if(mode==FALLING)
+	if(mode == FALLING)
+	{
 		GPIO_EnableInt(pio,pos,GPIO_INT_FALLING);
-	else if(mode==RISING)		
+	}
+	else if(mode == RISING)
+	{
 		GPIO_EnableInt(pio,pos,GPIO_INT_RISING);	
-	else if(mode==CHANGE)
+	}		
+	else if(mode == CHANGE)
+	{
 		GPIO_EnableInt(pio,pos,GPIO_INT_BOTH_EDGE);		
+	}
+		
 }
 
 void detachInterrupt(uint32_t pin)
 {
 
-	#ifdef USE_BoardToPin	
+#ifdef USE_BoardToPin	
 	if(pin > BoardToPin_MAX_COUNT) return;
 	pin=BoardToPinInfo[pin].pin;
-	#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-  #endif
+#else
+   if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
+#endif
   	
 	// Retrieve pin information
 	GPIO_T *pio = GPIO_Desc[pin].P;
@@ -137,32 +145,32 @@ void detachInterrupt(uint32_t pin)
 	// Disable interrupt
 	GPIO_DisableInt(pio,pos);
 	
-#if defined(__M252__)|| (__M480__)
+
     /*special mode for Softserial*/
-    if(   (g_u8Softserail_enable)
-        &&(pio == g_u8Softserail_port_base) 
-        &&(pos == g_u8Softserail_pin_num) 
-    ) { //check if the softserial rx pin
+    if( (g_u8Softserail_enable) && (pio == g_u8Softserail_port_base) && (pos == g_u8Softserail_pin_num))
+	{ //check if the softserial rx pin
         g_u8Softserail_enable=0;
         pfn_software_uart_handler = NULL;
         
-    } else { //orign path
-#endif
-	if (pio == PA )
-		callbacksGPA[pos] = NULL;
-	else if (pio == PB )
-		callbacksGPB[pos] = NULL;
-	else if (pio == PC )
-		callbacksGPC[pos] = NULL;
-	else if (pio == PD )
-		callbacksGPD[pos] = NULL;
-	else if (pio == PE )
-		callbacksGPE[pos] = NULL;
-	else if (pio == PF )
-		callbacksGPF[pos] = NULL;			
-#if defined(__M252__)|| (__M480__)
+    } 
+	else 
+	{ //orign path
+
+	    if (pio == PA )
+		    callbacksGPA[pos] = NULL;
+	    else if (pio == PB )
+		    callbacksGPB[pos] = NULL;
+	    else if (pio == PC )
+		    callbacksGPC[pos] = NULL;
+	    else if (pio == PD )
+		    callbacksGPD[pos] = NULL;
+	    else if (pio == PE )
+		    callbacksGPE[pos] = NULL;
+	    else if (pio == PF )
+		    callbacksGPF[pos] = NULL;			
+
 	}
-#endif
+
 
 }
 
@@ -172,993 +180,136 @@ extern "C" {
 
 void GPA_IRQHandler(void)
 {
-#if defined(__M252__)|| (__M480__)
+
+	uint32_t i;		
 	/* For SoftSerial patch */  
     /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
+    if( pfn_software_uart_handler) 
+	{ 
         pfn_software_uart_handler();
     } 
-#endif
-	  uint32_t i;		
-	  for (i=0; i<GNUM; i++) {
+
+	
+	for (i=0; i<GNUM; i++) 
+	{
 	  	if(PA->INTSRC & (1<<i))
 	  	{ 
 	  		if (callbacksGPA[i]) callbacksGPA[i]();	  		
 	  		PA->INTSRC = (1<<i);
 	  	}
-	  }  
+	}  
 }
 void GPB_IRQHandler(void)
 {
-#if defined(__M252__)|| (__M480__)
+
+	uint32_t i;		
 	/* For SoftSerial patch */  
     /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
+    if( pfn_software_uart_handler) 
+	{ 
         pfn_software_uart_handler();
     } 
-#endif
 
-		uint32_t i;		
-	  for (i=0; i<GNUM; i++) {
+
+	for (i=0; i<GNUM; i++) 
+	{
 	  	if(PB->INTSRC & (1<<i))
 	  	{ 
 	  		if (callbacksGPB[i]) callbacksGPB[i]();	  		
 	  		PB->INTSRC = (1<<i);
 	  	}
-	  }  
+	}  
 }
 
 void GPC_IRQHandler(void)
 {
-#if defined(__M252__)|| (__M480__)
+
+	uint32_t i;		
 	/* For SoftSerial patch */  
     /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
+    if( pfn_software_uart_handler) 
+	{ 
         pfn_software_uart_handler();
     } 
-#endif
-		uint32_t i;		
-	  for (i=0; i<GNUM; i++) {
+	
+	for (i=0; i<GNUM; i++) 
+	{
 	  	if(PC->INTSRC & (1<<i))
 	  	{ 
 	  		if (callbacksGPC[i]) callbacksGPC[i]();	  		
 	  		PC->INTSRC = (1<<i);
 	  	}
-	  }  
+	}  
 }
 
 void GPD_IRQHandler(void)
 {
-#if defined(__M252__)|| (__M480__)
+
+	uint32_t i;		
 	/* For SoftSerial patch */  
     /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
+    if( pfn_software_uart_handler) 
+	{ 
         pfn_software_uart_handler();
     } 
-#endif
-		uint32_t i;		
-	  for (i=0; i<GNUM; i++) {
+
+	for (i=0; i<GNUM; i++) 
+	{
 	  	if(PD->INTSRC & (1<<i))
 	  	{ 
 	  		if (callbacksGPD[i]) callbacksGPD[i]();	  		
 	  		PD->INTSRC = (1<<i);
 	  	}
-	  }  
+	}  
 }
 
-#if defined(__M252__)|| (__M480__)
+
 void GPE_IRQHandler(void)
-#else
-void GGPE_IRQHandler(void)
-#endif
 {
-#if defined(__M252__)|| (__M480__)
+
+	uint32_t i;		
 	/* For SoftSerial patch */  
     /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
+    if( pfn_software_uart_handler) 
+	{ 
         pfn_software_uart_handler();
     } 
-#endif
-		uint32_t i;		
-	  for (i=0; i<GNUM; i++) {
+
+	for (i=0; i<GNUM; i++) 
+	{
 	  	if(PE->INTSRC & (1<<i))
 	  	{ 
 	  		if (callbacksGPE[i]) callbacksGPE[i]();	  		
 	  		PE->INTSRC = (1<<i);
 	  	}
-	  }  
+	}  
 }
 
-#if defined(__M252__)|| (__M480__)
 void GPF_IRQHandler(void)
-#else
-void GGPF_IRQHandler(void)
-#endif
 {
-#if defined(__M252__)|| (__M480__)
+
+	uint32_t i;		
 	/* For SoftSerial patch */  
     /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
+    if( pfn_software_uart_handler) 
+	{ 
         pfn_software_uart_handler();
     } 
-#endif
-		uint32_t i;		
-	  for (i=0; i<GNUM; i++) {
+
+	for (i=0; i<GNUM; i++) 
+	{
 	  	if(PF->INTSRC & (1<<i))
 	  	{ 
 	  		if (callbacksGPF[i]) callbacksGPF[i]();	  		
 	  		PF->INTSRC = (1<<i);
 	  	}
-	  }  
+	}  
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#elif defined(__NUC240__)
 
-typedef void (*interruptCB)(void);
 
-static interruptCB callbacksPA[8];
-static interruptCB callbacksPB[8];
-static interruptCB callbacksPC[8];
-static interruptCB callbacksPD[8];
-static interruptCB callbacksPE[8];
-static interruptCB callbacksPF[8];
-
-
-/* Configure PIO interrupt sources */
-static void __initialize() {
-	int i;
-	for (i=0; i<8; i++) {
-		callbacksPA[i] = NULL;
-		callbacksPB[i] = NULL;
-		callbacksPC[i] = NULL;
-		callbacksPD[i] = NULL;
-		callbacksPE[i] = NULL;
-		callbacksPF[i] = NULL;
-	}
-	NVIC_EnableIRQ(GPAB_IRQn);
-	NVIC_EnableIRQ(GPCDEF_IRQn);
-}
-
-void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
-{
-	static int enabled = 0;
-	
-#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
- #endif
-  		
-	if (!enabled) {
-		__initialize();
-		enabled = 1;
-	}
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	
-	for (t = mask; t>1; t>>=1, pos++);
-	// Set callback function
-	
-	if (pio == PA )
-		callbacksPA[pos] = callback;
-	else if (pio == PB )
-		callbacksPB[pos] = callback;
-	else if (pio == PC )
-		callbacksPC[pos] = callback;
-	else if (pio == PD )
-		callbacksPD[pos] = callback;
-	else if (pio == PE )
-		callbacksPE[pos] = callback;
-	else if (pio == PF )
-		callbacksPF[pos] = callback;		
-	// Enable interrupt
-	if(mode==FALLING)
-		GPIO_EnableInt(pio,pos,GPIO_INT_FALLING);
-	else if(mode==RISING)		
-		GPIO_EnableInt(pio,pos,GPIO_INT_RISING);	
-	else if(mode==CHANGE)
-		GPIO_EnableInt(pio,pos,GPIO_INT_BOTH_EDGE);		
-}
-
-void detachInterrupt(uint32_t pin)
-{
-
-	#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-	#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-  #endif
-  	
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	for (t = mask; t>1; t>>=1, pos++);	
-
-	// Disable interrupt
-	GPIO_DisableInt(pio,pos);
-	
-	if (pio == PA )
-		callbacksPA[pos] = NULL;
-	else if (pio == PB )
-		callbacksPB[pos] = NULL;
-	else if (pio == PC )
-		callbacksPC[pos] = NULL;
-	else if (pio == PD )
-		callbacksPD[pos] = NULL;
-	else if (pio == PE )
-		callbacksPE[pos] = NULL;
-	else if (pio == PF )
-		callbacksPF[pos] = NULL;		
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void GPAB_IRQHandler(void)
-{
-		uint32_t i;		
-	  for (i=0; i<8; i++) {
-	  	if(PA->ISRC & (1<<i))
-	  	{ 
-	  		if (callbacksPA[i]) callbacksPA[i]();	  		
-	  		PA->ISRC = (1<<i);
-	  	}
-	  	if(PB->ISRC & (1<<i))
-	  	{
-	  		if (callbacksPB[i]) callbacksPB[i]();
-	  		PB->ISRC = (1<<i);
-	  	}
-	  }  
-}
-void GPCDEF_IRQHandler(void)
-{
-		uint32_t i;	
-	  for (i=0; i<8; i++) {
-	  	if(PC->ISRC & (1<<i))
-	  	{
-	  		if (callbacksPC[i]) callbacksPC[i]();	  		
-				PC->ISRC = (1<<i);	  			
-	  	}
-	  	if(PD->ISRC & (1<<i)) 
-	  	{
-	  		if (callbacksPD[i]) callbacksPD[i]();
-	  		PD->ISRC = (1<<i);	
-	  	}
-	  	if(PE->ISRC & (1<<i)) 
-	  	{
-	  		if (callbacksPE[i]) callbacksPE[i]();	  			
-	  		PE->ISRC = (1<<i);	
-	  	}
-	  	if(PF->ISRC & (1<<i)) 
-	  	{
-	  		if (callbacksPF[i]) callbacksPF[i]();	  			
-	  		PF->ISRC = (1<<i);	
-	  	}	  	
-	  }     
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-#elif defined(__NANO100__)
-
-#define GP_NUM 16
-typedef void (*interruptCB)(void);
-
-static interruptCB callbacksPA[GP_NUM];
-static interruptCB callbacksPB[GP_NUM];
-static interruptCB callbacksPC[GP_NUM];
-static interruptCB callbacksPD[GP_NUM];
-static interruptCB callbacksPE[GP_NUM];
-static interruptCB callbacksPF[GP_NUM];
-
-
-/* Configure PIO interrupt sources */
-static void __initialize() {
-	int i;
-	for (i=0; i<GP_NUM; i++) {
-		callbacksPA[i] = NULL;
-		callbacksPB[i] = NULL;
-		callbacksPC[i] = NULL;
-		callbacksPD[i] = NULL;
-		callbacksPE[i] = NULL;		
-	}
-	NVIC_EnableIRQ(GPABC_IRQn);
-	NVIC_EnableIRQ(GPDEF_IRQn);
-}
-
-static int enabled = 0;
-void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
-{		
-#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-#endif
-  		
-	if (!enabled) {
-		__initialize();
-		enabled = 1;
-	}
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	
-	for (t = mask; t>1; t>>=1, pos++);
-	// Set callback function
-	
-	if (pio == PA )
-		callbacksPA[pos] = callback;
-	else if (pio == PB )
-		callbacksPB[pos] = callback;
-	else if (pio == PC )
-		callbacksPC[pos] = callback;
-	else if (pio == PD )
-		callbacksPD[pos] = callback;
-	else if (pio == PE )
-		callbacksPE[pos] = callback;
-	else if (pio == PF )
-		callbacksPF[pos] = callback;		
-	// Enable interrupt
-	if(mode==FALLING)
-		GPIO_EnableInt(pio,pos,GPIO_INT_FALLING);
-	else if(mode==RISING)		
-		GPIO_EnableInt(pio,pos,GPIO_INT_RISING);	
-	else if(mode==CHANGE)
-		GPIO_EnableInt(pio,pos,GPIO_INT_BOTH_EDGE);		
-}
-
-void detachInterrupt(uint32_t pin)
-{
-
-	#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-	#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-  #endif
-  	
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	for (t = mask; t>1; t>>=1, pos++);	
-
-	// Disable interrupt
-	GPIO_DisableInt(pio,pos);
-	
-	if (pio == PA )
-		callbacksPA[pos] = NULL;
-	else if (pio == PB )
-		callbacksPB[pos] = NULL;
-	else if (pio == PC )
-		callbacksPC[pos] = NULL;
-	else if (pio == PD )
-		callbacksPD[pos] = NULL;
-	else if (pio == PE )
-		callbacksPE[pos] = NULL;
-	else if (pio == PF )
-		callbacksPF[pos] = NULL;		
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void GPABC_IRQHandler(void)
-{
-		uint32_t i;				
-	  for (i=0; i<GP_NUM; i++) {
-	  	if(PA->ISR & (1<<i))
-	  	{ 
-	  		if (callbacksPA[i]) callbacksPA[i]();	  		
-	  		PA->ISR = (1<<i);
-	  	}
-	  	if(PB->ISR & (1<<i))
-	  	{
-	  		if (callbacksPB[i]) callbacksPB[i]();
-	  		PB->ISR = (1<<i);
-	  	}
-	  	if(PC->ISR & (1<<i))
-	  	{
-	  		if (callbacksPC[i]) callbacksPC[i]();
-	  		PC->ISR = (1<<i);
-	  	}	  	
-	  }  
-}
-void GPDEF_IRQHandler(void)
-{
-		uint32_t i;	
-	  for (i=0; i<GP_NUM; i++) {
-	  	if(PD->ISR & (1<<i))
-	  	{
-	  		if (callbacksPD[i]) callbacksPD[i]();	  		
-				PD->ISR = (1<<i);	  			
-	  	}
-	  	if(PE->ISR & (1<<i)) 
-	  	{
-	  		if (callbacksPE[i]) callbacksPE[i]();
-	  		PE->ISR = (1<<i);	
-	  	}
-	  	if(PF->ISR & (1<<i)) 
-	  	{
-	  		if (callbacksPF[i]) callbacksPF[i]();	  			
-	  		PF->ISR = (1<<i);	
-	  	}
-	  }     
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-#elif defined(__NANO1X2__)
-
-#define GP_NUM 16
-typedef void (*interruptCB)(void);
-
-static interruptCB callbacksPA[GP_NUM];
-static interruptCB callbacksPB[GP_NUM];
-static interruptCB callbacksPC[GP_NUM];
-static interruptCB callbacksPD[GP_NUM];
-static interruptCB callbacksPE[GP_NUM];
-static interruptCB callbacksPF[GP_NUM];
-
-
-/* Configure PIO interrupt sources */
-static void __initialize() {
-	int i;
-	for (i=0; i<GP_NUM; i++) {
-		callbacksPA[i] = NULL;
-		callbacksPB[i] = NULL;
-		callbacksPC[i] = NULL;
-		callbacksPD[i] = NULL;
-		callbacksPE[i] = NULL;		
-	}
-	NVIC_EnableIRQ(GPABC_IRQn);
-	NVIC_EnableIRQ(GPDEF_IRQn);
-}
-
-static int enabled = 0;
-void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
-{		
-#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-#endif
-  		
-	if (!enabled) {
-		__initialize();
-		enabled = 1;
-	}
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	
-	for (t = mask; t>1; t>>=1, pos++);
-	// Set callback function
-	
-	if (pio == PA )
-		callbacksPA[pos] = callback;
-	else if (pio == PB )
-		callbacksPB[pos] = callback;
-	else if (pio == PC )
-		callbacksPC[pos] = callback;
-	else if (pio == PD )
-		callbacksPD[pos] = callback;
-	else if (pio == PE )
-		callbacksPE[pos] = callback;
-	else if (pio == PF )
-		callbacksPF[pos] = callback;		
-	// Enable interrupt
-	if(mode==FALLING)
-		GPIO_EnableInt(pio,pos,GPIO_INT_FALLING);
-	else if(mode==RISING)		
-		GPIO_EnableInt(pio,pos,GPIO_INT_RISING);	
-	else if(mode==CHANGE)
-		GPIO_EnableInt(pio,pos,GPIO_INT_BOTH_EDGE);		
-}
-
-void detachInterrupt(uint32_t pin)
-{
-
-	#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-	#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-  #endif
-  	
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	for (t = mask; t>1; t>>=1, pos++);	
-
-	// Disable interrupt
-	GPIO_DisableInt(pio,pos);
-	
-	if (pio == PA )
-		callbacksPA[pos] = NULL;
-	else if (pio == PB )
-		callbacksPB[pos] = NULL;
-	else if (pio == PC )
-		callbacksPC[pos] = NULL;
-	else if (pio == PD )
-		callbacksPD[pos] = NULL;
-	else if (pio == PE )
-		callbacksPE[pos] = NULL;
-	else if (pio == PF )
-		callbacksPF[pos] = NULL;		
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void GPABC_IRQHandler(void)
-{
-		uint32_t i;				
-	  for (i=0; i<GP_NUM; i++) {
-	  	if(PA->ISRC & (1<<i))
-	  	{ 
-	  		if (callbacksPA[i]) callbacksPA[i]();	  		
-	  		PA->ISRC = (1<<i);
-	  	}
-	  	if(PB->ISRC & (1<<i))
-	  	{
-	  		if (callbacksPB[i]) callbacksPB[i]();
-	  		PB->ISRC = (1<<i);
-	  	}
-	  	if(PC->ISRC & (1<<i))
-	  	{
-	  		if (callbacksPC[i]) callbacksPC[i]();
-	  		PC->ISRC = (1<<i);
-	  	}	  	
-	  }  
-}
-void GPDEF_IRQHandler(void)
-{
-		uint32_t i;	
-	  for (i=0; i<GP_NUM; i++) {
-	  	if(PD->ISRC & (1<<i))
-	  	{
-	  		if (callbacksPD[i]) callbacksPD[i]();	  		
-				PD->ISRC = (1<<i);	  			
-	  	}
-	  	if(PE->ISRC & (1<<i)) 
-	  	{
-	  		if (callbacksPE[i]) callbacksPE[i]();
-	  		PE->ISRC = (1<<i);	
-	  	}
-	  	if(PF->ISRC & (1<<i)) 
-	  	{
-	  		if (callbacksPF[i]) callbacksPF[i]();	  			
-	  		PF->ISRC = (1<<i);	
-	  	}
-	  }     
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-#elif(__NUC131__)
-
-#define GP_NUM 16
-
-typedef void (*interruptCB)(void);
-
-static interruptCB callbacksPA[GP_NUM];
-static interruptCB callbacksPB[GP_NUM];
-static interruptCB callbacksPC[GP_NUM];
-static interruptCB callbacksPD[GP_NUM];
-static interruptCB callbacksPE[GP_NUM];
-static interruptCB callbacksPF[GP_NUM];
-
-
-/* for software serial */
-uint8_t g_u8Softserail_enable=0;
-uint8_t g_u8Softserail_port_num;
-uint8_t g_u8Softserail_pin_num;
-static interruptCB pfn_software_uart_handler = NULL;
-GPIO_T* g_u8Softserail_port_base;
-
-
-/* Configure PIO interrupt sources */
-static void __initialize() {
-	int i;
-	for (i=0; i<8; i++) {
-		callbacksPA[i] = NULL;
-		callbacksPB[i] = NULL;
-		callbacksPC[i] = NULL;
-		callbacksPD[i] = NULL;
-		callbacksPE[i] = NULL;
-		callbacksPF[i] = NULL;
-	}
-	NVIC_EnableIRQ(GPAB_IRQn);
-	NVIC_EnableIRQ(GPCDEF_IRQn);
-}
-
-void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
-{
-	static int enabled = 0;
-	
-#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-#endif
-  		
-	if (!enabled) {
-		__initialize();
-		enabled = 1;
-	}
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	
-	for (t = mask; t>1; t>>=1, pos++);
-	// Set callback function
-	
-    /*special mode for Softserial*/
-    if(   (g_u8Softserail_enable)
-        &&(pio == g_u8Softserail_port_base) 
-        &&(pos == g_u8Softserail_pin_num) 
-    ) { //check if the softserial rx pin
-        pfn_software_uart_handler = callback;
-        
-    } else { //orign path
-    
-        if (pio == PA )
-            callbacksPA[pos] = callback;
-        else if (pio == PB )
-            callbacksPB[pos] = callback;
-        else if (pio == PC )
-            callbacksPC[pos] = callback;
-        else if (pio == PD )
-            callbacksPD[pos] = callback;
-        else if (pio == PE )
-            callbacksPE[pos] = callback;
-        else if (pio == PF )
-            callbacksPF[pos] = callback;
-    }
-	// Enable interrupt
-	if(mode==FALLING)
-		GPIO_EnableInt(pio,pos,GPIO_INT_FALLING);
-	else if(mode==RISING)		
-		GPIO_EnableInt(pio,pos,GPIO_INT_RISING);	
-	else if(mode==CHANGE)
-		GPIO_EnableInt(pio,pos,GPIO_INT_BOTH_EDGE);	
-        
-}
-
-void detachInterrupt(uint32_t pin)
-{
-
-	#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-	#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-  #endif
-  	
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	for (t = mask; t>1; t>>=1, pos++);	
-
-	// Disable interrupt
-	GPIO_DisableInt(pio,pos);
-    
-    /*special mode for Softserial*/
-    if(   (g_u8Softserail_enable)
-        &&(pio == g_u8Softserail_port_base) 
-        &&(pos == g_u8Softserail_pin_num) 
-    ) { //check if the softserial rx pin
-        g_u8Softserail_enable=0;
-        pfn_software_uart_handler = NULL;
-        
-    } else { //orign path
-        if (pio == PA )
-            callbacksPA[pos] = NULL;
-        else if (pio == PB )
-            callbacksPB[pos] = NULL;
-        else if (pio == PC )
-            callbacksPC[pos] = NULL;
-        else if (pio == PD )
-            callbacksPD[pos] = NULL;
-        else if (pio == PE )
-            callbacksPE[pos] = NULL;
-        else if (pio == PF )
-            callbacksPF[pos] = NULL;		
-    }
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void GPAB_IRQHandler(void)
-{
-      /* For SoftSerial patch */  
-    /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
-        pfn_software_uart_handler();
-    } 
-      /***********************/
-      uint32_t i;
-	  for (i=0; i<GP_NUM; i++) {
-	  	if(PA->ISRC & (1<<i))
-	  	{ 
-	  		if (callbacksPA[i]) callbacksPA[i]();	  		
-	  		PA->ISRC = (1<<i);
-	  	}
-	  	if(PB->ISRC & (1<<i))
-	  	{
-	  		if (callbacksPB[i]) callbacksPB[i]();
-	  		PB->ISRC = (1<<i);
-	  	}
-	  }  
-}
-void GPCDEF_IRQHandler(void)
-{   
-    /* For SoftSerial patch */  
-    /* put handler here for better responding time for higher baudrate. */
-    if(pfn_software_uart_handler) { 
-        pfn_software_uart_handler();
-    } 
-    /************************/
-    
-    uint32_t i;	
-    for (i=0; i<GP_NUM; i++) {
-        if(PC->ISRC & (1<<i))
-        {
-            if (callbacksPC[i]) callbacksPC[i]();	  		
-                PC->ISRC = (1<<i);	  			
-        }
-        if(PD->ISRC & (1<<i)) 
-        {
-            if (callbacksPD[i]) callbacksPD[i]();
-            PD->ISRC = (1<<i);	
-        }
-        if(PE->ISRC & (1<<i)) 
-        {
-            if (callbacksPE[i]) callbacksPE[i]();	  			
-            PE->ISRC = (1<<i);	
-        }
-        if(PF->ISRC & (1<<i)) 
-        {
-            if (callbacksPF[i]) callbacksPF[i]();	  			
-            PF->ISRC = (1<<i);	
-        }	  	
-    }     
-}
-
-#ifdef __cplusplus
-}
-#endif
-#elif defined(__M032BT__)|| defined(__M032KG__)
-//#elif(__M032BT__)
-
-#define GP_NUM 16
-
-typedef void (*interruptCB)(void);
-
-static interruptCB callbacksPA[GP_NUM];
-static interruptCB callbacksPB[GP_NUM];
-static interruptCB callbacksPC[GP_NUM];
-// static interruptCB callbacksPD[GP_NUM];
-static interruptCB callbacksPE[GP_NUM];
-static interruptCB callbacksPF[GP_NUM];
-
-
-/* for software serial */
-uint8_t g_u8Softserail_enable=0;
-uint8_t g_u8Softserail_port_num;
-uint8_t g_u8Softserail_pin_num;
-static interruptCB pfn_software_uart_handler = NULL;
-GPIO_T* g_u8Softserail_port_base;
-
-
-/* Configure PIO interrupt sources */
-static void __initialize() {
-	int i;
-	for (i=0; i < GP_NUM; i++) {
-		callbacksPA[i] = NULL;
-		callbacksPB[i] = NULL;
-		callbacksPC[i] = NULL;
-		// callbacksPD[i] = NULL;
-		callbacksPE[i] = NULL;
-		callbacksPF[i] = NULL;
-	}
-	NVIC_EnableIRQ(GPIO_PAPBPGPH_IRQn);
-	NVIC_EnableIRQ(GPIO_PCPDPEPF_IRQn);
-}
-
-void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
-{
-	static int enabled = 0;
-	
-#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-#endif
-  		
-	if (!enabled) {
-		__initialize();
-		enabled = 1;
-	}
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	
-	for (t = mask; t>1; t>>=1, pos++);
-	// Set callback function
-	
-    /*special mode for Softserial*/
-    if(   (g_u8Softserail_enable)
-        &&(pio == g_u8Softserail_port_base) 
-        &&(pos == g_u8Softserail_pin_num) 
-    ) { //check if the softserial rx pin
-        pfn_software_uart_handler = callback;
-        
-    } else { //origin path
-    
-        if (pio == PA )
-            callbacksPA[pos] = callback;
-        else if (pio == PB )
-            callbacksPB[pos] = callback;
-        else if (pio == PC )
-            callbacksPC[pos] = callback;
-        // else if (pio == PD )
-        //     callbacksPD[pos] = callback;
-        else if (pio == PE )
-            callbacksPE[pos] = callback;
-        else if (pio == PF )
-            callbacksPF[pos] = callback;
-    }
-	// Enable interrupt
-	if(mode==FALLING)
-		GPIO_EnableInt(pio,pos,GPIO_INT_FALLING);
-	else if(mode==RISING)		
-		GPIO_EnableInt(pio,pos,GPIO_INT_RISING);	
-	else if(mode==CHANGE)
-		GPIO_EnableInt(pio,pos,GPIO_INT_BOTH_EDGE);	
-        
-}
-
-void detachInterrupt(uint32_t pin)
-{
-
-	#ifdef USE_BoardToPin	
-	if(pin > BoardToPin_MAX_COUNT) return;
-	pin=BoardToPinInfo[pin].pin;
-	#else
-  if(pin>GPIO_MAX_COUNT || GPIO_Desc[pin].P==NULL) return;
-  #endif
-  	
-	// Retrieve pin information
-	GPIO_T *pio = GPIO_Desc[pin].P;
-	uint32_t mask = GPIO_Desc[pin].bit;
-	uint32_t pos = 0;
-	uint32_t t;
-	for (t = mask; t>1; t>>=1, pos++);	
-
-	// Disable interrupt
-	GPIO_DisableInt(pio,pos);
-    
-    /*special mode for Softserial*/
-    if(   (g_u8Softserail_enable)
-        &&(pio == g_u8Softserail_port_base) 
-        &&(pos == g_u8Softserail_pin_num) 
-    ) { //check if the softserial rx pin
-        g_u8Softserail_enable=0;
-        pfn_software_uart_handler = NULL;
-        
-    } else { //orign path
-        if (pio == PA )
-            callbacksPA[pos] = NULL;
-        else if (pio == PB )
-            callbacksPB[pos] = NULL;
-        else if (pio == PC )
-            callbacksPC[pos] = NULL;
-        // else if (pio == PD )
-        //     callbacksPD[pos] = NULL;
-        else if (pio == PE )
-            callbacksPE[pos] = NULL;
-        else if (pio == PF )
-            callbacksPF[pos] = NULL;		
-    }
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void GPABGH_IRQHandler(void)
-{
-	/* For SoftSerial patch */  
-    /* put handler here for better responding time for higher baudrate. */
-    if( pfn_software_uart_handler) { 
-        pfn_software_uart_handler();
-    } 
-      /***********************/
-      uint32_t i;
-	  for (i=0; i<GP_NUM; i++) {
-	  	if(PA->INTSRC & (1<<i))
-	  	{ 
-	  		if (callbacksPA[i]) callbacksPA[i]();	  		
-	  		PA->INTSRC = (1<<i);
-	  	}
-	  	if(PB->INTSRC & (1<<i))
-	  	{
-	  		if (callbacksPB[i]) callbacksPB[i]();
-	  		PB->INTSRC = (1<<i);
-	  	}
-	  }  
-}
-void GPCDEF_IRQHandler(void)
-{   
-	/* For SoftSerial patch */  
-	/* put handler here for better responding time for higher baudrate. */
-	if(pfn_software_uart_handler) { 
-		pfn_software_uart_handler();
-	} 
-	/************************/
-	
-	uint32_t i;	
-	for (i=0; i<GP_NUM; i++) {
-		if(PC->INTSRC & (1<<i))
-		{
-			if (callbacksPC[i]) callbacksPC[i]();	  		
-				PC->INTSRC = (1<<i);	  			
-		}
-		if(PE->INTSRC & (1<<i)) 
-		{
-			if (callbacksPE[i]) callbacksPE[i]();	  			
-			PE->INTSRC = (1<<i);	
-		}
-		if(PF->INTSRC & (1<<i)) 
-		{
-			if (callbacksPF[i]) callbacksPF[i]();	  			
-			PF->INTSRC = (1<<i);	
-		}	  	
-	}     
-}
-
-#ifdef __cplusplus
-}
-#endif
 #endif
