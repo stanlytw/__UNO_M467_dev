@@ -12,8 +12,8 @@
 #ifndef _NVTCANDFS_H_
 #define _NVTCANDFS_H_
 
-#include <Arduino.h>
-#include <nvtCAN_m460.h>
+#include "Arduino.h"
+#include "nvtCAN_m460.h"
 #include <inttypes.h>
 
 
@@ -21,6 +21,8 @@
     #define DEBUG_EN        1
 #endif
 
+#define CAN_BAUDRATE_4M        (uint32_t)(4000000)
+#define CAN_BAUDRATE_1M        (uint32_t)(1000000)
 #define CAN_BAUDRATE_1000K     (uint32_t)(1000000)
 #define CAN_BAUDRATE_800K      (uint32_t)(800000)
 #define CAN_BAUDRATE_666K      (uint32_t)(666000)

@@ -16,53 +16,7 @@
 /*static member data initialization*/
 uint32_t nvtCAN_m460::g32IIDRStatus = 0;
 CANFD_FD_MSG_T nvtCAN_m460::rxCANMsg;// ={0};
-#if CANFD_MAX_COUNT > 0
-#define CAN_ID0 0
-static void CANFD_0_Init(void) 
-{	
-	/*
-	    Set CANFD MFP
-	*/
-	CANFD_Config(CANFD_Desc[CAN_ID0]);	
-}
 
-static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint32_t u32dataBitRate ) 
-{	
-	CANFD_FD_T sCANFD_Config;
-	uint32_t nRate;
-	uint32_t bRate;
-	//Mode check 
-	if(u8OpMode == CANFD_OP_CAN_MODE)//Normal
-	{
-		nRate = u32normalBitRate;
-		bRate = 0;
-	}
-	else if(u8OpMode == CANFD_OP_CAN_FD_MODE)//FD　mode
-	{
-	    nRate = u32normalBitRate;
-		bRate = u32dataBitRate;
-	}
-	else//Other mode
-	{
-		return -1;
-	}
-	/* Get the CAN FD configuration value */
-    CANFD_GetDefaultConfig(&sCANFD_Config, u8OpMode);
-    sCANFD_Config.sBtConfig.sNormBitRate.u32BitRate = nRate;
-    sCANFD_Config.sBtConfig.sDataBitRate.u32BitRate = bRate;
-	
-    /* Open the CAN FD feature */
-    CANFD_Open(CANFD0, &sCANFD_Config);
-	
-	NVIC_EnableIRQ(CANFD00_IRQn);
-	
-	/* CAN Run to Normal mode */
-    CANFD_RunToNormal(CANFD0, TRUE);
-	
-	return 0;
-	
-}
-#endif
 /*********************************************************************************************************
 ** Function name:           nvtCAN(constructor)
 ** Descriptions:            reset the device
@@ -74,9 +28,9 @@ nvtCAN_m460::nvtCAN_m460(byte _CANSEL)
    nCANSel = _CANSEL;
    
    /*Variable initialization */
-   canspeed_set = CAN_100KBPS;
+   canspeed_set = CAN_BAUDRATE_10K;
    nReservedTx = 0;
-   opmode = CANFD_OP_CAN_MODE;
+   canmode = CANFD_OP_CAN_MODE;
   
    if( _CANSEL)
    {
@@ -90,8 +44,9 @@ nvtCAN_m460::nvtCAN_m460(byte _CANSEL)
        ncan = (CANFD_T *)CANFD0;
    }
    
-   //[2025-03-17]Reset CANFD　IP
-   ncan_reset();
+   //[2025-03-17]Reset CANFD　IP.
+   //This will be done in CANFD_Open
+   //ncan_reset();
    
   
    //for(nn=0; nn < NVT_MAXFILTER_NUM; nn++) rxMsgAMsk[nn].ulIDMask = 0;
@@ -151,19 +106,49 @@ byte nvtCAN_m460::begin(uint32_t speedset, const byte clockset) {
     CANFD_0_Init();
    
     /* Get the CAN FD configuration value and update with user desired setting.*/
+    //Default use CAN mode
     //Normal Rate 1M
-    //Flexible Rate 4M
-    res = CANFD_0_SetConfig(CANFD_OP_CAN_MODE, 1000000, 4000000);
+    res = CANFD_0_SetConfig(CANFD_OP_CAN_MODE, speedset, 40000);
     
+    //[2025-03-18]seems no need in can-fd. These are covered in CANFD_Open
     //nvtspeed = BaudRateSelector(speedset);  
     //canspeed_set = speedset;
     //res = ncan_configRate(nvtspeed, clockset);
-     
+
+    //[2025-03-18] todo 
     //res = ncan_enableInterrupt();
     return res;
 }
 
-
+/*********************************************************************************************************
+** Function name:           begin
+** Descriptions:            init can/can-fd and set speed
+                            normalspeed for CAN
+                            dataspeed for CAN-FD
+*********************************************************************************************************/
+byte nvtCAN_m460::begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode) {
+    
+    uint32_t nvtspeed;
+    byte res = 0x00 ;
+	canmode = opmode;
+	
+	/* Set CANFD Pin MFP. Currently CANFD0 only */
+    CANFD_0_Init();
+   
+    /* Get the CAN FD configuration value and update with user desired setting.*/
+    //Normal Rate 1M
+    //Flexible Rate 4M
+    res = CANFD_0_SetConfig(opmode, normalspeed, dataspeed);
+    
+    //[2025-03-18]seems no need in can-fd. These are covered in CANFD_Open
+    //nvtspeed = BaudRateSelector(speedset);  
+    //canspeed_set = speedset;
+    //res = ncan_configRate(nvtspeed, clockset);
+     
+    //[2025-03-18] todo
+    //res = ncan_enableInterrupt();
+    return res;
+}
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
 ** Descriptions:            Send message by using buffer read as free from CANINTF status
@@ -173,7 +158,8 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, 
    
     int32_t ires = 0x00;
     uint8_t nn;
-  
+
+#if 0  
     CANFD_FD_MSG_T      sTxMsgFrame;
 	
 	
@@ -199,6 +185,7 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, 
 	/* Use message buffer 0 */
     #define CANFD_BUF0 (0)
     ires = CANFD_TransmitTxMsg(CANFD0, CANFD_BUF0, &sTxMsgFrame);
+#endif	
 	return (byte)(ires);
 	
 	//Legacy//
@@ -258,27 +245,53 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
     #define CANFD_BUF0 (0)
     ires = CANFD_TransmitTxMsg(CANFD0, CANFD_BUF0, &sTxMsgFrame);
 	return (byte)(ires);
-	
-	//Legacy//
-    //if(rtrBit==0x01){
-    //    msg1.FrameType = CAN_REMOTE_FRAME;
-    //    len = 0; /*DLC=0 for remote frame*/
-    //}
-    //else if(rtrBit==0x00){
-    //    msg1.FrameType = CAN_DATA_FRAME;
-    //}
-    //else return 0xFF; 
 
-    //msg1.IdType   = ext;
-    //msg1.Id       = id;
-    //msg1.DLC      = len;
-    //for(nn=0; nn<len;nn++)
-    //{
-    //    msg1.Data[nn] = buf[nn];
-    //}
-    //ires = CAN_Transmit(ncan, 0, &msg1);
 }
 
+
+byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile const byte* buf, uint8_t is_fd) {
+   
+    int32_t ires = 0x00;
+    uint8_t nn;
+  
+    CANFD_FD_MSG_T      sTxMsgFrame;
+	if(!is_fd)
+		return 0xF1;//For FD only
+	if(canmode!=CANFD_OP_CAN_FD_MODE)
+		return 0xF2;//For FD only
+	
+	//Processing FD packets
+    if(ext==0x01){
+        sTxMsgFrame.eIdType = eCANFD_XID;
+    }
+    else if(ext==0x00){
+        sTxMsgFrame.eIdType = eCANFD_SID;
+    }
+    else return 0xFF;
+	
+	/* Set the id */
+	sTxMsgFrame.u32Id = id;
+	/* Set data length */
+    sTxMsgFrame.u32DLC = len;
+	/* Set the frame type */
+    sTxMsgFrame.eFrmType = eCANFD_DATA_FRM;
+    
+	/* Set CAN FD frame format */
+    sTxMsgFrame.bFDFormat = 1;
+    /* Set the bitrate switch */
+    sTxMsgFrame.bBitRateSwitch = 1;
+			
+	for(nn=0; nn<len;nn++)
+    {
+        sTxMsgFrame.au8Data[nn] = buf[nn];
+    }
+	
+	/* Use message buffer 0 */
+    #define CANFD_BUF0 (0)
+    ires = CANFD_TransmitTxMsg(CANFD0, CANFD_BUF0, &sTxMsgFrame);
+	return (byte)(ires);
+
+}
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
 ** Descriptions:            Send message by using buffer read as free from CANINTF status
@@ -474,10 +487,8 @@ byte nvtCAN_m460::ncan_init(const byte canSpeed, const byte clock) {
 }
 
 #if CANFD_MAX_COUNT > 0
-//#define CAN_ID0 0
-//static void CANFD_0_Init(void) {	
-//	CANFD_Config(CANFD_Desc[CAN_ID0]);	
-//}
+#define CAN_ID0 0
+#endif
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* CAN0 interrupt handler                                                                                  */
@@ -499,6 +510,50 @@ void CANFD0_IRQHandler(void)
    
 }
 
+static void CANFD_0_Init(void) 
+{	
+	/*
+	    Set CANFD MFP
+	*/
+	CANFD_Config(CANFD_Desc[CAN_ID0]);	
+}
+
+static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint32_t u32dataBitRate ) 
+{	
+	CANFD_FD_T sCANFD_Config;
+	uint32_t nRate;
+	uint32_t bRate;
+	//Mode check 
+	if(u8OpMode == CANFD_OP_CAN_MODE)//Normal
+	{
+		nRate = u32normalBitRate;
+		bRate = 0;
+	}
+	else if(u8OpMode == CANFD_OP_CAN_FD_MODE)//FD　mode
+	{
+	    nRate = u32normalBitRate;
+		bRate = u32dataBitRate;
+	}
+	else//Other mode
+	{
+		return -1;
+	}
+	/* Get the CAN FD configuration value */
+    CANFD_GetDefaultConfig(&sCANFD_Config, u8OpMode);
+    sCANFD_Config.sBtConfig.sNormBitRate.u32BitRate = nRate;
+    sCANFD_Config.sBtConfig.sDataBitRate.u32BitRate = bRate;
+	
+    /* Open the CAN FD feature */
+    CANFD_Open(CANFD0, &sCANFD_Config);
+	
+	NVIC_EnableIRQ(CANFD00_IRQn);
+	
+	/* CAN Run to Normal mode */
+    CANFD_RunToNormal(CANFD0, TRUE);
+	
+	return 0;
+	
+}
 
 /*********************************************************************************************************
 ** Function name:           BaudRateCheck
@@ -519,93 +574,6 @@ byte BaudRateCheck(uint32_t u32BaudRate, uint32_t u32RealBaudRate)
     return res;
 }
 
-
-/*********************************************************************************************************
-** Function name:           BaudRateSelector
-** Descriptions:            to map MCP2515 BaudRate setting to NUC131
-*********************************************************************************************************/
-uint32_t BaudRateSelector(uint32_t u32mcpBaudRate)
-{
-    uint32_t u32NvtBaudRate;
-
-   switch(u32mcpBaudRate)
-    {
-        case CAN_10KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_10K;
-            break;
-
-        case CAN_20KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_20K;
-            break;
-
-        case CAN_25KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_25K;
-            break;
-
-        case CAN_31K25BPS:
-             u32NvtBaudRate = CAN_BAUDRATE_31K25;
-            break;
-
-        case CAN_33KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_33K;
-            break;        
-
-        case CAN_40KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_40K;
-            break;
-
-        case CAN_50KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_50K;
-            break;
-
-        case CAN_80KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_80K;
-            break;
-
-        case CAN_83K3BPS:
-             u32NvtBaudRate = CAN_BAUDRATE_83K3;
-            break;
-
-        case CAN_95KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_95K;
-            break;
-
-         case CAN_100KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_100K;
-            break;
-
-        case CAN_125KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_125K;
-            break;
-
-        case CAN_200KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_200K;
-            break;
-
-        case CAN_250KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_250K;
-            break;
-
-        case CAN_666KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_666K;
-            break;        
-
-        case CAN_800KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_800K;
-            break;
-
-        case CAN_1000KBPS:
-             u32NvtBaudRate = CAN_BAUDRATE_1000K;
-            break;
-
-        default:
-             u32NvtBaudRate = CAN_BAUDRATE_10K;
-            break;
-
-    
-     }
-     return u32NvtBaudRate;
-}
 
 /* Configure CAN interrupt resources */
 static void __initializeCAN() {
@@ -631,7 +599,7 @@ void attachInterruptCAN(void (*callback)(void))
 #ifdef __cplusplus
 }
 #endif
-#endif
+
 /*********************************************************************************************************
     END FILE
 *********************************************************************************************************/

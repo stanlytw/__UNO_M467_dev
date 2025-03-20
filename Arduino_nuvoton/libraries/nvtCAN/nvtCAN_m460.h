@@ -37,19 +37,19 @@ public:
     
 public:
     /*CAN operator function*/
-    virtual byte begin(uint32_t speedset, const byte clockset = MCP_16MHz);
-                                                                              
-    virtual byte init_Mask(byte num, byte ext, unsigned long ulData);                                                                                   // init Masks
-    virtual byte init_Filt(byte num, byte ext, unsigned long ulData);                                                                                   // init filters
+    byte begin(uint32_t speedset, const byte clockset = MCP_16MHz);
+    byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode);                                                                              
+    byte init_Mask(byte num, byte ext, unsigned long ulData);                                                                                   // init Masks
+    byte init_Filt(byte num, byte ext, unsigned long ulData);                                                                                   // init filters
    
-    virtual byte checkReceive(void);                                                                                                                    // if something received
+    byte checkReceive(void);                                                                                                                    // if something received
    
-    virtual byte readMsgBuf(byte *len, byte *buf);
-    virtual byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);
+    byte readMsgBuf(byte *len, byte *buf);
+    byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);
    
-    virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf);                                  // send message buf
+    byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf);                                  // send message buf
  
-    virtual byte sendMsgBufwMsgObj(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf);              // send message buf by using Msg Object
+    byte sendMsgBufwMsgObj(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf);              // send message buf by using Msg Object
     
     /* could be called after a successful readMsgBufID() */
     unsigned long getCanId(void) { return can_id; }
@@ -58,7 +58,9 @@ public:
  
 
     byte sendMsgBuf(unsigned long id, byte ext, byte len, volatile const byte *buf);
-
+    byte sendMsgBuf(unsigned long id, byte ext, byte len, volatile const byte* buf, uint8_t is_fd);
+	
+	
 private:
     /*Nuvoton CAN controller(ccan) driver function */
     void ncan_reset(void); // reset ncan
@@ -71,7 +73,7 @@ private:
     byte ncan_init(const byte canSpeed, const byte clock);       // ncan init
 
     byte sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent = true); // send message
-
+    
 public:    
     RxMsgAndMskType rxMsgAMsk[NVT_MAXFILTER_NUM];
     /*functions to access static member data*/
@@ -87,6 +89,7 @@ private:
     };
     uint32_t module;
     uint32_t opmode;
+	uint32_t canmode;
     uint32_t canspeed_set;
     byte nCANSel;
     IRQn_Type id;
