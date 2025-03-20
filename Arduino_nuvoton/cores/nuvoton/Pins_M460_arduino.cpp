@@ -268,7 +268,7 @@ SPIPinDescription SPI_Desc[] =
 UARTPinDescription UART_Desc[] =
 {
 #if defined(__M460MINIMA__)
-    {(UART_T *)(0),  (uint32_t)(0), (uint32_t)(UART_USE_NOUSE), (IRQn_Type)(0), {{-1, (uint32_t)(0) },               {-1, (uint32_t)(0) }}              ,  (uint32_t)(0)            , UART_CLKDIV_1},   //(USE VCOM)
+    {(UART_T *)(0),  (uint32_t)(0), (uint32_t)(UART_USE_VCOM), (IRQn_Type)(0), {{-1, (uint32_t)(0) },               {-1, (uint32_t)(0) }}              ,  (uint32_t)(0)            , UART_CLKDIV_1},   //(USE VCOM)
 	{UART0, (uint32_t)UART0_MODULE, (uint32_t)(UART_USE_UART0), UART0_IRQn, {{119, SYS_GPB_MFP3_PB12MFP_UART0_RXD },  {118, SYS_GPB_MFP3_PB13MFP_UART0_TXD }},  CLK_CLKSEL1_UART0SEL_HIRC, UART_CLKDIV_1},   //(T/R = PB12/PB13)
     {UART1, (uint32_t)UART1_MODULE, (uint32_t)(UART_USE_UART1), UART1_IRQn, {{102, SYS_GPB_MFP0_PB2MFP_UART1_RXD  },  {101, SYS_GPB_MFP0_PB3MFP_UART1_TXD  }},  CLK_CLKSEL1_UART1SEL_HIRC, UART_CLKDIV_1},   //(T/R = PB3/PB2)
 #else

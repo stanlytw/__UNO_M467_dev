@@ -248,6 +248,21 @@ do { \
         outp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP) & ~GPIO_Desc[Desc.pintype[i].num].Pin.Mask) | Desc.pintype[i].type); \
 }while(0);
 
+
+/*========== CANFD definition ==========*/
+#define CANFD_MAX_COUNT 1
+extern CANFDPinDescription CANFD_Desc[];
+#define CANFD_CLKDIV_1           (0x01)
+#define CANFD_USE_CANFD0         (0x00)
+#define CANFD_USE_CANFD1         (0x01)
+
+#define CANFD_Config(Desc) \
+do { \
+    uint8_t i; \
+    for(i=0;i<2;i++) \
+        outp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP,(inp32(GPIO_Desc[Desc.pintype[i].num].Pin.MFP) & ~GPIO_Desc[Desc.pintype[i].num].Pin.Mask) | Desc.pintype[i].type); \
+}while(0);
+
 /*========== Arduino PIN mapping definition ==========*/
 static const uint8_t SS   = 41;
 static const uint8_t MOSI = 43;
