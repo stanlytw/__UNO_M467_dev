@@ -13,10 +13,12 @@
 #include "nvtCAN_m460.h"
 #include "canfd.h"
 
-/*static member data initialization*/
-uint32_t nvtCAN_m460::g32IIDRStatus = 0;
-CANFD_FD_MSG_T nvtCAN_m460::rxCANMsg;// ={0};
 
+
+/*static member data initialization*/
+//uint32_t g32IIDRStatus = 0;
+//CANFD_FD_MSG_T rxCANMsg;// ={0};
+static CANFD_FD_MSG_T sRxMsgFrame;
 /*********************************************************************************************************
 ** Function name:           nvtCAN(constructor)
 ** Descriptions:            reset the device
@@ -257,11 +259,83 @@ byte nvtCAN_m460::begin(uint32_t speedset) {
 		}		
 	}
 	
-    //[2025-03-18] todo 
+	//[2025-03-21] CAN TX configuration
+	/*
+	    On the fly
+	*/
+	
+	
+	
+	//[2025-03-21] CAN RX configuration
+    /*
+	    Default: Keep all so that some msg can be get without setting SID/XID fileter
+	*/	
+	ncan_configGFC(gfcconfig);
+		
+	//Sync CCCR[0]
+	ncan_syncInit();
+	//[2025-03-18] todo 
     //res = ncan_enableInterrupt();
-    
 	return res;
 }
+
+
+/*********************************************************************************************************
+** Function name:           ncan_configGFC
+** Descriptions:            keep in FIFO or reject unmatched CAN msg. Wrapper to set CANFD GFC register 
+*********************************************************************************************************/
+uint8_t nvtCAN_m460::ncan_configGFC(uint8_t gfc_config)
+{
+    if(gfc_config == CANFD_GFC_REJEALL)//default
+	{
+       /* Reject Non-Matching Standard ID and Extended ID Filter(RX FIFO0) */
+	   CANFD_SetGFC(CANFD0, eCANFD_REJ_NON_MATCH_FRM, eCANFD_REJ_NON_MATCH_FRM, 1, 1);	   
+	}
+	else if(gfc_config == CANFD_GFC_KEEPALL)
+	{
+	   /* Reject Non-Matching Standard ID and Extended ID Filter(all to FIFO0) */
+	   CANFD_SetGFC(CANFD0, eCANFD_ACC_NON_MATCH_FRM_RX_FIFO0, eCANFD_ACC_NON_MATCH_FRM_RX_FIFO0, 0, 0);
+	}
+	else
+	{
+		return -1;
+	}
+	
+	gfcconfig = gfc_config;
+    return 0;
+}
+
+/*********************************************************************************************************
+** Function name:           setMsgFilter
+** Descriptions:            set is ID,xID filter are set. 
+*********************************************************************************************************/
+byte nvtCAN_m460::setMsgFilter(uint32_t en)
+{
+	if(en)
+	{
+	    gfcconfig = CANFD_GFC_REJEALL;
+ 	}
+	else
+	{
+		gfcconfig = CANFD_GFC_KEEPALL;
+	}
+	return 0;	
+}
+
+
+
+
+
+/*********************************************************************************************************
+** Function name:           ncan_syncInit
+** Descriptions:            Sync CCCR[0] once Init. configuration changes 
+*********************************************************************************************************/
+int32_t nvtCAN_m460::ncan_syncInit(void)
+{
+     /* CAN Run to Normal mode */
+	return CANFD_RunToNormal(CANFD0, 1);
+}
+
 
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
@@ -273,6 +347,40 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, 
     int32_t ires = 0x00;
     uint8_t nn;
 
+	CANFD_FD_MSG_T      sTxMsgFrame;
+	
+	//ID or xID
+    if(ext==0x01){
+        sTxMsgFrame.eIdType = eCANFD_XID;
+    }
+    else if(ext==0x00){
+        sTxMsgFrame.eIdType = eCANFD_SID;
+    }
+    else return 0xFF; 
+	
+	
+	//remote frame or data frame
+	if(rtrBit==0x01){
+        sTxMsgFrame.eFrmType = eCANFD_REMOTE_FRM;
+    }
+    else if(rtrBit==0x00){
+        sTxMsgFrame.eFrmType = eCANFD_DATA_FRM;
+    }
+    else return 0xFF; 
+
+
+	sTxMsgFrame.u32Id = id;
+    sTxMsgFrame.u32DLC = len;
+	sTxMsgFrame.bBitRateSwitch = 0;
+	
+	for(nn=0; nn<len;nn++)
+    {
+        sTxMsgFrame.au8Data[nn] = buf[nn];
+    }
+	
+	/* Use message buffer 0 */
+    
+    ires = CANFD_TransmitTxMsg(CANFD0, CANFD_TXBUF0, &sTxMsgFrame);
 	return (byte)(ires);
 
 }
@@ -309,8 +417,8 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
     }
 	
 	/* Use message buffer 0 */
-    #define CANFD_BUF0 (0)
-    ires = CANFD_TransmitTxMsg(CANFD0, CANFD_BUF0, &sTxMsgFrame);
+    
+    ires = CANFD_TransmitTxMsg(CANFD0, CANFD_TXBUF0, &sTxMsgFrame);
 	return (byte)(ires);
 
 }
@@ -354,8 +462,7 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
     }
 	
 	/* Use message buffer 0 */
-    #define CANFD_BUF0 (0)
-    ires = CANFD_TransmitTxMsg(CANFD0, CANFD_BUF0, &sTxMsgFrame);
+    ires = CANFD_TransmitTxMsg(CANFD0, CANFD_TXBUF0, &sTxMsgFrame);
 	return (byte)(ires);
 
 }
@@ -366,27 +473,28 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
 *********************************************************************************************************/
  byte nvtCAN_m460::readMsgBuf(byte *len, byte *buf)
  {
-     uint32_t res = 0x00;
-     uint32_t ii;
-     if(opmode == CANFD_OP_CAN_MODE)
-     {
-        //*len =  nvtCAN_m460::rxCANMsg.DLC;
-        //for(ii=0;ii<*len;ii++) *buf++ = nvtCAN_m460::rxCANMsg.Data[ii];
-        //ext_flg = nvtCAN_m460::rxCANMsg.IdType;          // type, either extended (the 29 LSB) or standard (the 11 LSB)
-        //can_id  = nvtCAN_m460::rxCANMsg.Id;              // can id
-        //rtr     = !(nvtCAN_m460::rxCANMsg.FrameType);    // is remote frame, add "!", see can.c CAN_BasicReceiveMsg
-        //res     = 0xFFFFFFFF;
-     }
-     //else if(opmode == CAN_NORMAL_MODE)/*Normal Mode*//*Normal Mode*/
-     //{
-     //   *len =  nvtCAN_m460::rxCANMsg.DLC;
-     //   for(ii=0;ii<*len;ii++) *buf++ = nvtCAN_m460::rxCANMsg.Data[ii];
-     //   ext_flg = nvtCAN_m460::rxCANMsg.IdType;          // type, either extended (the 29 LSB) or standard (the 11 LSB)
-     //   can_id  = nvtCAN_m460::rxCANMsg.Id;              // can id
-     //   rtr     = nvtCAN_m460::rxCANMsg.FrameType;      // is remote frame
-     //   res     = nvtCAN_m460::g32IIDRStatus;
-     //}
-     return (byte)(res);
+    uint32_t res = 0x00;
+    uint32_t ii;
+	 
+	 
+	*len =  sRxMsgFrame.u32DLC;           // data length
+     
+	for(ii=0;ii<*len;ii++)                // data content
+	*buf++ = sRxMsgFrame.au8Data[ii];
+     
+	ext_flg = sRxMsgFrame.eIdType;        // type, either extended (the 29 LSB) or standard (the 11 LSB)
+     
+	can_id  = sRxMsgFrame.u32Id;          // can id
+     
+	rtr     = !(sRxMsgFrame.eFrmType);    // is remote frame, add "!", see can.c CAN_BasicReceiveMsg
+	 
+	fdformat = sRxMsgFrame.bFDFormat;      // FD format bit
+	 
+	switchBR = sRxMsgFrame.bBitRateSwitch; // Bit rate switching bit
+     
+	res     = 0xFF;
+
+    return (byte)(res);
 
  }
 
@@ -409,9 +517,56 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
 ** Function name:           checkReceive
 ** Descriptions:            check if got something, if yes, keep it in rxCANMsg
 *********************************************************************************************************/
-byte nvtCAN_m460::checkReceive(void) {
-    
-    return 0x00;
+byte nvtCAN_m460::checkReceive(void) 
+{
+	
+	if( gfcconfig == CANFD_GFC_KEEPALL )
+	{
+	    /*
+	       By designed, FIFO will either KeepAll or RejectAll
+	       Msg FIFO0(ID and xID)
+	    */	
+	   
+	    /* Check for any received unmatched STD messages on CAN message FIFO0 */
+		if(CANFD_ReadRxFifoMsg(CANFD0, CANFD_RXFIFO0, &sRxMsgFrame) == 1)
+        {
+            //printf("Rx FIFO 0: Received message 0x%08X (11-bit)\r\n", sRxMsgFrame.u32Id);
+            //printf("Message Data : ");
+
+            //for(u8Cnt = 0; u8Cnt < sRxMsgFrame.u32DLC; u8Cnt++)
+            //{
+                //printf("%02d ,", sRxMsgFrame.au8Data[u8Cnt]);
+
+            //    if(sRxMsgFrame.au8Data[u8Cnt] != u8Cnt + u8RxTestNum)
+            //    {
+            //        u8ErrFlag = 1;
+            //    }
+			//}
+        }
+     
+	}
+	else if( gfcconfig == CANFD_GFC_REJEALL )
+	{
+	  /*
+	   Msg Buffer0(ID)
+	  */
+	  if( idfilter_set )
+	  {
+		  
+	  }
+	  /*
+	   Msg Buffer1(xID)
+	  */	
+	  if( xidfilter_set )
+	  {
+		  
+	  }
+	}
+	
+	
+	
+	
+	return 0x03;
 }
 
 
@@ -561,7 +716,7 @@ static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint3
 	NVIC_EnableIRQ(CANFD00_IRQn);
 	
 	/* CAN Run to Normal mode */
-    CANFD_RunToNormal(CANFD0, TRUE);
+    //CANFD_RunToNormal(CANFD0, TRUE);
 	
 	return 0;
 	

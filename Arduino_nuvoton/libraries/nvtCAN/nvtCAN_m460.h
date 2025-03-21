@@ -17,6 +17,7 @@
 #include "Arduino.h"
 #include "Pins_arduino.h"
 #include "mcp_can.h"
+#include "canfd.h"
 #include "nvtCAN_dfs_m460.h"
 
 typedef struct _RxMsgAndMskType
@@ -29,6 +30,21 @@ typedef struct _RxMsgAndMskType
 
 #define MAX_CHAR_IN_MESSAGE 8
 #define NVT_MAXFILTER_NUM 6
+
+
+//Dedinition for CAN-FD Buffer and FIFO resources
+#define CANFD_TXBUF0  (0)
+#define CANFD_TXBUF1  (1)
+
+#define CANFD_RXBUF0  (0)
+#define CANFD_RXBUF1  (1)
+#define CANFD_RXFIFO0 (0)
+#define CANFD_RXFIFO1 (1)
+
+#define CANFD_GFC_KEEPALL    (0)
+#define CANFD_GFC_REJEALL    (1)
+
+
 class nvtCAN_m460
 {
 public:
@@ -41,7 +57,10 @@ public:
     byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode);  
 
 	byte setMode(uint32_t opmode);
-	byte getMode(void)             { return canmode;        }
+	byte getMode(void)              { return canmode;        }
+	
+    byte setMsgFilter(uint32_t en);
+	
 	
 	uint32_t getSetSpeed(void)     { return canspeed_set;   }
 	uint32_t getNormalSpeed(void)  { return normalspeed_set;}
@@ -76,7 +95,10 @@ private:
     /*Nuvoton CAN controller(ccan) driver function */
     void ncan_reset(void); // reset ncan
     void ncan_resetIF(uint8_t u8IF_Num);//clear IF reg, for test_basic mode Rx 
-
+    int32_t ncan_syncInit(void);    
+	
+	uint8_t ncan_configGFC(uint8_t gfc_config);//keep in FIFO or reject unmatched CAN msg. 
+ 
     byte ncan_enableInterrupt(void);
     byte ncan_disableInterrupt(void);
  
@@ -88,9 +110,9 @@ private:
 public:    
     RxMsgAndMskType rxMsgAMsk[NVT_MAXFILTER_NUM];
     /*functions to access static member data*/
-    static CANFD_FD_MSG_T* getrxCANMsgPtr() { return &(rxCANMsg); }
+    //static CANFD_FD_MSG_T* getrxCANMsgPtr() { return &(sRxMsgFrame); }
     static void setg32IIDRStatus(uint32_t val) { g32IIDRStatus = val; }
-   
+    
 
 private:
     byte nReservedTx; // Count of tx buffers for reserved send
@@ -101,6 +123,11 @@ private:
     uint32_t module;
     uint32_t opmode;
 	uint32_t canmode;
+	uint32_t rxmode;
+	
+	uint8_t  gfcconfig =  CANFD_GFC_KEEPALL;//demo purpose, let gfc keepall when no id/xid masks are set.
+	uint8_t  idfilter_set = 0;
+	uint8_t  xidfilter_set = 0;
 	
     uint32_t canspeed_set = 0;
 	uint32_t normalspeed_set = 0;
@@ -111,18 +138,19 @@ private:
     byte ext_flg; 			// identifier xxxID, either extended (the 29 LSB) or standard (the 11 LSB)
     unsigned long can_id;   // can id
     byte rtr;               // is remote frame
+	byte fdformat;          // FD format
+	byte switchBR;          // Bit rate switching for FD
 	
     /*static member data*/
-    static CANFD_FD_MSG_T rxCANMsg;
-    static uint32_t g32IIDRStatus;
     
+    static uint32_t g32IIDRStatus;
+    //static CANFD_FD_MSG_T sRxMsgFrame;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 byte BaudRateCheck(uint32_t u32BaudRate, uint32_t u32RealBaudRate);
-
 static void CANFD_0_Init(void);
 static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint32_t u32dataBitRate ); 
 static interruptCB callbackCAN0;
