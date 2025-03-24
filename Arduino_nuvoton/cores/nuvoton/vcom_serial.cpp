@@ -851,7 +851,7 @@ void HID_RebootCmdhandler(void)
 
 }
 #if 1
-#define SERIAL_BUFFER_SIZE 16
+#define SERIAL_BUFFER_SIZE  256
 uint32_t VcomRxhandler(uint8_t* pch)
 {
     int32_t i, i32Len; 
