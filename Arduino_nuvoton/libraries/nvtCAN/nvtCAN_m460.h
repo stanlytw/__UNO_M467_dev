@@ -44,7 +44,7 @@ typedef struct _RxMsgAndMskType
 #define CANFD_GFC_KEEPALL    (0)
 #define CANFD_GFC_REJEALL    (1)
 
-
+#define IS_FD          (1)
 class nvtCAN_m460
 {
 public:
@@ -57,14 +57,14 @@ public:
     byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode);  
 
 	byte setMode(uint32_t opmode);
-	byte getMode(void)              { return canmode;        }
+	byte getMode(void)              { return _canmode;        }
 	
     byte setMsgFilter(uint32_t en);
 	
 	
-	uint32_t getSetSpeed(void)     { return canspeed_set;   }
-	uint32_t getNormalSpeed(void)  { return normalspeed_set;}
-    uint32_t getDataSpeed(void)    { return dataspeed_set;  } 
+	uint32_t getSetSpeed(void)     { return _canspeed_set;   }
+	uint32_t getNormalSpeed(void)  { return _normalspeed_set;}
+    uint32_t getDataSpeed(void)    { return _dataspeed_set;  } 
     
 	
     byte init_Mask(byte num, byte ext, unsigned long ulData);                                                                                   // init Masks
@@ -102,7 +102,7 @@ private:
     byte ncan_enableInterrupt(void);
     byte ncan_disableInterrupt(void);
  
-    byte ncan_configRate(const uint32_t canSpeed, const byte clock); // set baudrate
+    //byte ncan_configRate(const uint32_t canSpeed, const byte clock); // set baudrate
     byte ncan_init(const byte canSpeed, const byte clock);       // ncan init
 
     byte sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent = true); // send message
@@ -121,17 +121,19 @@ private:
         CANFD_T *ncan;
     };
     uint32_t module;
-    uint32_t opmode;
-	uint32_t canmode;
-	uint32_t rxmode;
+    //uint32_t opmode;
+	uint32_t _canmode;
+	uint32_t _rxmode;
+	
+	uint32_t _canspeed_set = 0;
+	uint32_t _normalspeed_set = 0;
+	uint32_t _dataspeed_set = 0;
 	
 	uint8_t  gfcconfig =  CANFD_GFC_KEEPALL;//demo purpose, let gfc keepall when no id/xid masks are set.
 	uint8_t  idfilter_set = 0;
 	uint8_t  xidfilter_set = 0;
 	
-    uint32_t canspeed_set = 0;
-	uint32_t normalspeed_set = 0;
-	uint32_t dataspeed_set = 0;
+   
     
 	byte nCANSel;
     IRQn_Type id;

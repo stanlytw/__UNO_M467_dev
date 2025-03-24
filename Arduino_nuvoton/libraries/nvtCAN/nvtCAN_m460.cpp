@@ -30,9 +30,9 @@ nvtCAN_m460::nvtCAN_m460(byte _CANSEL)
    nCANSel = _CANSEL;
    
    /*Variable initialization */
-   canspeed_set = CAN_BAUDRATE_10K;
+   _canspeed_set = CAN_BAUDRATE_10K;
    nReservedTx = 0;
-   canmode = CANFD_OP_CAN_MODE;
+   _canmode = CANFD_OP_CAN_MODE;
   
    if( _CANSEL)
    {
@@ -76,23 +76,23 @@ void nvtCAN_m460::ncan_reset(void) {
 ** Function name:           ncan_configRate
 ** Descriptions:            set baudrate
 *********************************************************************************************************/
-byte nvtCAN_m460::ncan_configRate(const uint32_t canSpeed, const byte clock) {
+//byte nvtCAN_m460::ncan_configRate(const uint32_t canSpeed, const byte clock) {
 
-    //Add NUC131 standard driver code to reset and enable CAN IP
+//    //Add NUC131 standard driver code to reset and enable CAN IP
  
-    uint32_t RealBaudRate = 0;
-    uint32_t BaudRate = canSpeed;
-    byte res = 0x00;
+//    uint32_t RealBaudRate = 0;
+//    uint32_t BaudRate = canSpeed;
+//    byte res = 0x00;
     /*Set target baud-rate and operation mode.*/
     //RealBaudRate = CAN_Open(ncan,  BaudRate, CANFD_OP_CAN_MODE);
     //opmode = CANFD_OP_CAN_MODE;
     /* Check the real baud-rate is OK */
     //res = BaudRateCheck(BaudRate, RealBaudRate);
     //ncan->CON |= (CAN_TEST_LBACK_Msk);
-    return res;
+//    return res;
   
-   
-}
+//   
+//}
 
 /*********************************************************************************************************
 ** Function name:           setMode
@@ -100,7 +100,7 @@ byte nvtCAN_m460::ncan_configRate(const uint32_t canSpeed, const byte clock) {
 *********************************************************************************************************/
 byte nvtCAN_m460::setMode(uint32_t opmode) {
 
-    canmode = opmode;
+    _canmode = opmode;
 
 }
 
@@ -129,19 +129,24 @@ byte nvtCAN_m460::BaudRateParser(uint32_t u32mcpBaudRate)
 		    Get dataspeed
 		*/
 		//[2025-03-20]Simple take the dataspeed_val = dataspeed_idx*100K
-		dataspeed_val = (uint32_t)(dataspeed_idx) * 100; 
+		dataspeed_val = (uint32_t)(dataspeed_idx) * 100 *1000; 
 		
 		
-		normalspeed_set = normalspeed_val;
-	    dataspeed_set = dataspeed_val;
+		_normalspeed_set = normalspeed_val;
+	    _dataspeed_set = dataspeed_val;
 		
 		res = 1;
 	}
 	else//CAN
 	{
-	    normalspeed_set = BaudRateSelector(u32mcpBaudRate);
+	    _normalspeed_set = BaudRateSelector(u32mcpBaudRate);
 	  	res = 0;
 	}
+
+    //Serial.print("bit check:");
+	//Serial.println(_normalspeed_set, DEC);
+	//Serial.println(_dataspeed_set, DEC);
+	
 
 	return res;
        
@@ -238,24 +243,24 @@ byte nvtCAN_m460::begin(uint32_t speedset) {
     //Check if mode vs speed settings are coincident
 	if(speedtype == 1)//CAN-FD
 	{
-		if( canmode != CANFD_OP_CAN_FD_MODE)
+		if( _canmode != CANFD_OP_CAN_FD_MODE)
 		{
 		    return -1;	
 		} 
 		else
 		{
-			res =  CANFD_0_SetConfig(CANFD_OP_CAN_FD_MODE, dataspeed_set, 0);
+			res =  CANFD_0_SetConfig(CANFD_OP_CAN_FD_MODE, _normalspeed_set, _dataspeed_set);
 		}
 	}
 	else//CAN
 	{
-		if( canmode != CANFD_OP_CAN_MODE)
+		if( _canmode != CANFD_OP_CAN_MODE)
 		{
 		    return -2;	
 		}
         else
         {
-			res = CANFD_0_SetConfig(CANFD_OP_CAN_MODE, normalspeed_set, 0);
+			res = CANFD_0_SetConfig(CANFD_OP_CAN_MODE, _normalspeed_set, 0);
 		}		
 	}
 	
@@ -432,7 +437,7 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
     CANFD_FD_MSG_T      sTxMsgFrame;
 	if(!is_fd)
 		return 0xF1;//For FD only
-	if(canmode!=CANFD_OP_CAN_FD_MODE)
+	if(_canmode!=CANFD_OP_CAN_FD_MODE)
 		return 0xF2;//For FD only
 	
 	//Processing FD packets
@@ -524,7 +529,7 @@ byte nvtCAN_m460::checkReceive(void)
 	{
 	    /*
 	       By designed, FIFO will either KeepAll or RejectAll
-	       Msg FIFO0(ID and xID)
+	       Msg FIFO0(ID) and  Msg FIFO1(xID)
 	    */	
 	   
 	    /* Check for any received unmatched STD messages on CAN message FIFO0 */
@@ -691,6 +696,8 @@ static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint3
 	uint32_t nRate;
 	uint32_t bRate;
 	//Mode check 
+	
+	
 	if(u8OpMode == CANFD_OP_CAN_MODE)//Normal
 	{
 		nRate = u32normalBitRate;
@@ -705,6 +712,7 @@ static byte CANFD_0_SetConfig(uint8_t u8OpMode, uint32_t u32normalBitRate, uint3
 	{
 		return -1;
 	}
+	
 	/* Get the CAN FD configuration value */
     CANFD_GetDefaultConfig(&sCANFD_Config, u8OpMode);
     sCANFD_Config.sBtConfig.sNormBitRate.u32BitRate = nRate;
