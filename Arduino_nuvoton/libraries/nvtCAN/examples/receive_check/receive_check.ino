@@ -1,6 +1,3 @@
-// demo: CAN-BUS Shield, receive data with check mode
-// send data coming to fast, such as less than 10ms, you can use this way
-// loovee, 2014-6-13
 
 
 #define CANFD_NVT
@@ -10,16 +7,17 @@
 #include "nvtCAN_m460.h"
 nvtCAN_m460 CAN(0); // Set nvt's parameter, if required.
 #endif
+#define SERIAL_PORT_MONITOR Serial
 
 void setup() {
-    Serial.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     
     //Default GFC: keepall
-    while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 500k
-        Serial.println("CAN init fail, retry...");
+    while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 100k
+        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
-    Serial.println("CAN init ok!");
+    SERIAL_PORT_MONITOR.println("CAN init ok!");
 }
 
 
@@ -32,15 +30,15 @@ void loop() {
 
         unsigned long canId = CAN.getCanId();
 
-        Serial.println("-----------------------------");
-        Serial.print("Get data from ID: 0x");
-        Serial.println(canId, HEX);
+        SERIAL_PORT_MONITOR.println("-----------------------------");
+        SERIAL_PORT_MONITOR.print("Get data from ID: 0x");
+        SERIAL_PORT_MONITOR.println(canId, HEX);
 
         for (int i = 0; i < len; i++) { // print the data
-            Serial.print(buf[i], HEX);
-            Serial.print("\t");
+            SERIAL_PORT_MONITOR.print(buf[i], HEX);
+            SERIAL_PORT_MONITOR.print("\t");
         }
-        Serial.println();
+        SERIAL_PORT_MONITOR.println();
     }
     delay(100);
 }

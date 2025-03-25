@@ -7,19 +7,20 @@
 #include "nvtCAN_m460.h"
 nvtCAN_m460 CAN(0); // Set nvt's parameter, if required.
 #endif
+#define SERIAL_PORT_MONITOR Serial
 
 const int LED        = 8;
 boolean ledON        = 1;
 
 void setup() {
-    Serial.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     pinMode(LED, OUTPUT);
 
-    while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 500k
-        Serial.println("CAN init fail, retry...");
+    while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 100k
+        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
-    Serial.println("CAN init ok!");
+    SERIAL_PORT_MONITOR.println("CAN init ok!");
 }
 
 
@@ -32,13 +33,13 @@ void loop() {
 
         unsigned long canId = CAN.getCanId();
 
-        Serial.println("-----------------------------");
-        Serial.println("get data from ID: 0x");
-        Serial.println(canId, HEX);
+        SERIAL_PORT_MONITOR.println("-----------------------------");
+        SERIAL_PORT_MONITOR.println("get data from ID: 0x");
+        SERIAL_PORT_MONITOR.println(canId, HEX);
 
         for (int i = 0; i < len; i++) { // print the data
-            Serial.print(buf[i]);
-            Serial.print("\t");
+            SERIAL_PORT_MONITOR.print(buf[i]);
+            SERIAL_PORT_MONITOR.print("\t");
             if (ledON && i == 0) {
 
                 digitalWrite(LED, buf[i]);
@@ -50,7 +51,7 @@ void loop() {
                 ledON = 1;
             }
         }
-        Serial.println();
+        SERIAL_PORT_MONITOR.println();
     }
     delay(10);
 }

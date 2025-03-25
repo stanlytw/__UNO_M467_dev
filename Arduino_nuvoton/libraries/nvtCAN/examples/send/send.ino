@@ -6,16 +6,18 @@
 nvtCAN_m460 CAN(0); // Set nvt's parameter, if required.
 #endif
 
+#define SERIAL_PORT_MONITOR Serial
+
 void setup() {
-    Serial.begin(115200);
-    while(!Serial){};
+    SERIAL_PORT_MONITOR.begin(115200);
+    while(!SERIAL_PORT_MONITOR){};
 
     
     while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 100k
-        Serial.println("CAN init fail, retry...");
+        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
-    Serial.println("CAN init ok!");
+    SERIAL_PORT_MONITOR.println("CAN init ok!");
 }
 
 unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0x30};
@@ -34,7 +36,7 @@ void loop() {
 
     CAN.sendMsgBuf(0x33, 0, 8, stmp);
     delay(100);                       // send data per 100ms
-    Serial.println("CAN BUS sendMsgBuf ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 }
 
 // END FILE

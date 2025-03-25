@@ -10,15 +10,17 @@ nvtCAN_m460 CAN(0); // Set nvt's parameter, if required.
 #define MAX_DATA_SIZE 8
 #endif
 
-void setup() {
-    Serial.begin(115200);
-    while (!Serial) {}
+#define SERIAL_PORT_MONITOR Serial
 
-    while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 500k
-        Serial.println(F("CAN init fail, retry..."));
+void setup() {
+    SERIAL_PORT_MONITOR.begin(115200);
+    while (!SERIAL_PORT_MONITOR) {}
+
+    while (CAN_OK != CAN.begin(CAN_BAUDRATE_100KBPS)) {             // init can bus : baudrate = 100k
+        SERIAL_PORT_MONITOR.println(F("CAN init fail, retry..."));
         delay(100);
     }
-    Serial.println(F("CAN init ok!"));
+    SERIAL_PORT_MONITOR.println(F("CAN init ok!"));
 }
 
 uint32_t id;
@@ -62,7 +64,7 @@ void loop() {
     for (i = 0; i < len; i++) {
         n += sprintf(prbuf + n, "%02X ", cdata[i]);
     }
-    Serial.println(prbuf);
+    SERIAL_PORT_MONITOR.println(prbuf);
 
     delay(100);
 }

@@ -525,6 +525,7 @@ byte nvtCAN_m460::sendMsgBuf(unsigned long id, byte ext, byte len, volatile cons
 byte nvtCAN_m460::checkReceive(void) 
 {
 	
+	byte res =0x00;
 	if( gfcconfig == CANFD_GFC_KEEPALL )
 	{
 	    /*
@@ -547,31 +548,25 @@ byte nvtCAN_m460::checkReceive(void)
             //        u8ErrFlag = 1;
             //    }
 			//}
+			res = 0x03;
         }
      
 	}
 	else if( gfcconfig == CANFD_GFC_REJEALL )
 	{
-	  /*
-	   Msg Buffer0(ID)
-	  */
-	  if( idfilter_set )
-	  {
-		  
-	  }
-	  /*
-	   Msg Buffer1(xID)
-	  */	
-	  if( xidfilter_set )
-	  {
-		  
-	  }
+	    /*
+	     Msg Buffer0(ID, xID)
+	    */
+	    if(CANFD_ReadRxBufMsg(CANFD0, CANFD_RXBUF0, &sRxMsgFrame) == 1)
+	    {
+		    res = 0x03;
+	    }
 	}
 	
 	
 	
 	
-	return 0x03;
+	return res;
 }
 
 
@@ -629,8 +624,25 @@ byte nvtCAN_m460::ncan_disableInterrupt(void) {
 *********************************************************************************************************/
 byte nvtCAN_m460::init_Mask(byte num, byte ext, unsigned long ulData)
 {
-
-    byte res = 0x00;
+    /* configuration change enable */
+    CANFD0->CCCR = CANFD_CCCR_INIT_Msk;
+    CANFD0->CCCR |= CANFD_CCCR_CCE_Msk;
+    
+	
+	/* set GFC to reject all unmatched Msg, keep Msg in filter*/
+	gfcconfig = CANFD_GFC_REJEALL;
+	ncan_configGFC(gfcconfig);
+	
+	/* set Mask */
+	//skip, since M460 CAN-FD stdDriver API handle these items, combined with filter
+	//std ID: CANFD_SetSIDFltr
+	//ext ID: CANFD_SetXIDFltr
+	
+	/* Set to normal mode*/
+	ncan_syncInit();
+	
+	
+	byte res = 0x00;
 
     return res;
 }
@@ -642,10 +654,31 @@ byte nvtCAN_m460::init_Mask(byte num, byte ext, unsigned long ulData)
 *********************************************************************************************************/
 byte nvtCAN_m460::init_Filt(byte num, byte ext, unsigned long ulData)
 {
-  
+    byte res =0;
+	/* configuration change enable */
+    CANFD0->CCCR = CANFD_CCCR_INIT_Msk;
+    CANFD0->CCCR |= CANFD_CCCR_CCE_Msk;
+	
+	/* set Filter */
+	
+	if(ext==0)//StdID, use rx message buffer 0
+	{
+		CANFD_SetSIDFltr(CANFD0, num, CANFD_RX_BUFFER_STD(ulData, CANFD_RXBUF0));
+		
+	}
+	else if(ext==1)//ExtID, use rx message buffer 0
+	{
+		CANFD_SetXIDFltr(CANFD0, num, CANFD_RX_BUFFER_EXT_LOW(ulData, CANFD_RXBUF0), CANFD_RX_BUFFER_EXT_HIGH(ulData, CANFD_RXBUF0));
+	}
+	else 
+		res = -1;
+	/* Set to normal mode*/
+	ncan_syncInit();
        
-    return (0x00);
+    return (res);
 }
+
+
 
 
 /*********************************************************************************************************

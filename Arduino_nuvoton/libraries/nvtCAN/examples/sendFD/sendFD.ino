@@ -20,7 +20,7 @@ void setup() {
      */
     CAN.setMode(CANFD_OP_CAN_FD_MODE);
 
-    // init can bus : arbitration bitrate = 500k, data bitrate = 1M
+    // init can bus : arbitration bitrate = 100k, data bitrate = 400K
     while (0 != CAN.begin(CAN_BAUDRATE_100K_400K)) {
         SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
