@@ -1,12 +1,12 @@
-int redpin = 9;    // select the input pin for the potentiometer
-int bluepin =10;      // select the pin for the LED
+int redpin = D12;    // select the input pin for the potentiometer
+int bluepin =D13;      // select the pin for the LED
 int val;
 
 void setup()
 {
     pinMode(redpin, OUTPUT);
     pinMode(bluepin, OUTPUT);
-    Serial.begin(9600);
+    Serial.begin(115200);
 }
 
 void loop()

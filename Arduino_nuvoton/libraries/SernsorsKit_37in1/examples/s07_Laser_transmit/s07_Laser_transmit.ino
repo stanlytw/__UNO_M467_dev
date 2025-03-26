@@ -1,11 +1,11 @@
 void setup() 
 {                
- pinMode(13, OUTPUT);  
+ pinMode(D8, OUTPUT);  
 }
 
 void loop() {
-  digitalWrite(13, HIGH);   
+  digitalWrite(D8, HIGH);   
   delay(1000);              
-  digitalWrite(13, LOW);    
+  digitalWrite(D8, LOW);    
   delay(1000);             
 }

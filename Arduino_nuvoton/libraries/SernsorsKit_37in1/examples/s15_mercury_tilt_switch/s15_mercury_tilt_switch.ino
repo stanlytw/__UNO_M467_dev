@@ -17,8 +17,8 @@
 
 // constants won't change. They're used here to
 // set pin numbers:
-const int mercurySwitchPin = 10; // the number of the mercury tilt switch pin
-const int ledPin =  13;          // the number of the LED pin
+const int mercurySwitchPin = D2; // the number of the mercury tilt switch pin
+const int ledPin =  D7;          // the number of the LED pin
 
 // variables will change:
 int buttonState = 0;         // variable for reading the mercury tilt switch pin status

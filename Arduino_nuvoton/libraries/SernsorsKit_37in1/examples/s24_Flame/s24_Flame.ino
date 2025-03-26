@@ -26,8 +26,8 @@
 
 // constants won't change. They're used here to
 // set pin numbers:
-const int flameSensorPin = 10;     // the number of the flame sensor pin
-const int ledPin =  13;      // the number of the LED pin
+const int flameSensorPin = D10;     // the number of the flame sensor pin
+const int ledPin =  D8;      // the number of the LED pin
 
 // variables will change:
 int flameSensorState = 0;         // variable for reading the flame sensor status

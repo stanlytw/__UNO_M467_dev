@@ -28,8 +28,8 @@
 
 // constants won't change. They're used here to 
 // set pin numbers:
-const int voiceSensorDO_Pin = 10;     // the number of the voice sensor pin
-const int ledPin =  13;      // the number of the LED pin
+const int voiceSensorDO_Pin = D10;     // the number of the voice sensor pin
+const int ledPin =  D8;      // the number of the LED pin
 
 // variables will change:
 int voiceSensorState = 0;         // variable for reading the voice sensor status

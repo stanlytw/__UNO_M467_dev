@@ -1,6 +1,6 @@
 #include <dht11.h>
 dht11 DHT;
-#define DHT11_PIN 10
+#define DHT11_PIN D2
 
 void setup()
 {

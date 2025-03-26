@@ -1,5 +1,5 @@
-int Led=13;
-int Shock=3;
+int Led=D7;
+int Shock=D2;
 int val;
 void setup()
 {

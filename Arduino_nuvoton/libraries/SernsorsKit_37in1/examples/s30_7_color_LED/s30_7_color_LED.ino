@@ -4,7 +4,7 @@
  
   This example code is in the public domain.
  */
-int pin=10; //connect the to 7 color flash LED. 
+int pin=D10; //connect the to 7 color flash LED. 
         
 void setup() {                
   // initialize the digital pin as an output.

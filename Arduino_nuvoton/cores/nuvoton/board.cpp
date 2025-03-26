@@ -69,8 +69,9 @@ void Enable_All_IPs(void)
 #endif
     /* Enable SDH0 module clock source as HCLK and SDH0 module clock divider as 4 */
     //[2024-11-06]Since no wrap for sdh, enable ip clock here.
-    CLK_EnableModuleClock(SDH0_MODULE);
-    CLK_SetModuleClock(SDH0_MODULE, CLK_CLKSEL0_SDH0SEL_HCLK, CLK_CLKDIV0_SDH0(4));
+	//[2025-03-25]Change to SD1
+    CLK_EnableModuleClock(SDH1_MODULE);
+    CLK_SetModuleClock(SDH1_MODULE, CLK_CLKSEL0_SDH1SEL_HCLK, CLK_CLKDIV3_SDH1(4));
 	
 	
 	/* Enable CANFD module clock source and proper divide by 1, ref Std sample code */
@@ -87,13 +88,27 @@ void Enable_All_IPs(void)
     /* SD0 Pin define for M467SJ */
 #if defined(__M467SJHAN__)
     /*M467SJ:*/
-	SET_SD0_nCD_PB12();
-    SET_SD0_CLK_PB1();
-    SET_SD0_CMD_PB0();
-    SET_SD0_DAT0_PB2();
-    SET_SD0_DAT1_PB3();
-    SET_SD0_DAT2_PB4();
-    SET_SD0_DAT3_PB5();
+	//SET_SD1_nCD_PB12();
+    SET_SD1_CLK_PA4();
+    SET_SD1_CMD_PA5();
+    SET_SD1_DAT0_PA8();
+    SET_SD1_DAT1_PA9();
+    SET_SD1_DAT2_PA10();
+    SET_SD1_DAT3_PA11();
+
+#if 0	
+	/* Enable UART0 module clock */
+    CLK_EnableModuleClock(UART0_MODULE);
+
+    /* Select UART0 module clock source as HIRC and UART0 module clock divider as 1 */
+    CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART0SEL_HIRC, CLK_CLKDIV0_UART0(1));
+	
+	/* Set multi-function pins for UART0 RXD and TXD */
+    SET_UART0_RXD_PA6();
+    SET_UART0_TXD_PA7();
+		
+	UART_Open(UART0, 115200);
+#endif
 #else
     /*M467HJ*/
     SET_SD0_nCD_PD13();

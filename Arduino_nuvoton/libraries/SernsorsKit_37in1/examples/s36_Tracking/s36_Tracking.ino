@@ -26,8 +26,8 @@
 
 // constants won't change. They're used here to
 // set pin numbers:
-const int sensorPin = 10;     // the number of the tracking sensor pin
-const int ledPin =  13;      // the number of the LED pin
+const int sensorPin = D10;     // the number of the tracking sensor pin
+const int ledPin =  D7;      // the number of the LED pin
 
 // variables will change:
 int sensorState = 0;         // variable for reading the tracking sensor status

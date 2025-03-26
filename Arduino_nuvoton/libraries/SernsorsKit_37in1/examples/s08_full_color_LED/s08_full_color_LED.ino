@@ -1,6 +1,6 @@
-int redpin = 11;    // select LED output pin for red LED
-int bluepin =10;    // select LED output pin for blue LED
-int greenpin =9;    // select LED output pin for green LED
+int redpin = D10;    // select LED output pin for red LED
+int bluepin =D12;    // select LED output pin for blue LED
+int greenpin =D13;    // select LED output pin for green LED
 int val;
 
 void setup()
@@ -8,7 +8,7 @@ void setup()
     pinMode(redpin, OUTPUT);
     pinMode(bluepin, OUTPUT);
     pinMode(greenpin, OUTPUT);
-    Serial.begin(9600);
+    Serial.begin(115200);
 }
 
 void loop()

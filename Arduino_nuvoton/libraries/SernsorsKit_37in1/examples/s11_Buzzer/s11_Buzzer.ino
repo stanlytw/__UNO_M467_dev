@@ -1,4 +1,4 @@
-int buzzer=11;
+int buzzer=D2;
 void setup()
 {
     pinMode(buzzer,OUTPUT);

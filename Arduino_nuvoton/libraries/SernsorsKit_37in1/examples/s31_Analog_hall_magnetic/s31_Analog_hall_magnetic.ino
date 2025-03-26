@@ -1,10 +1,10 @@
-int Led=13;
-int SENSOR=A0;
+int Led=D8;
+int SENSOR=A5;
 int val;
 void setup()
 {
   pinMode(Led,OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 void loop()
 {

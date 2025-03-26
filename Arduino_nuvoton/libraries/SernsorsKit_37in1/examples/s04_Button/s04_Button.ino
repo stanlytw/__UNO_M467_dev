@@ -1,5 +1,5 @@
-int Led=13; //define LED Interfac
-int buttonpin=3; //define the key switch sensor interface
+int Led=D7; //define LED Interfac
+int buttonpin=D2; //define the key switch sensor interface
 int val; //define numeric variables val
 void setup()
 {  

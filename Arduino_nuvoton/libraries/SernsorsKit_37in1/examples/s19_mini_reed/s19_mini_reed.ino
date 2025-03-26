@@ -24,8 +24,8 @@
 
 // constants won't change. They're used here to 
 // set pin numbers:
-const int miniReedSwitchPin = 10;     // the number of the miniReedSwitch pin
-const int ledPin =  13;      // the number of the LED pin
+const int miniReedSwitchPin = D2;     // the number of the miniReedSwitch pin
+const int ledPin =  D8;      // the number of the LED pin
 
 // variables will change:
 int switchState = 0;         // variable for reading the miniReedSwitch status

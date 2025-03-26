@@ -1,5 +1,5 @@
-int Led=13;
-int obstacleDetectionPin=10;
+int Led=D7;
+int obstacleDetectionPin=D10;
 int val;
 void setup()
 {

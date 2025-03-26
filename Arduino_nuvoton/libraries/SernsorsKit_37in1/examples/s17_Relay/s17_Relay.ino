@@ -1,4 +1,4 @@
-int Relay = 10;
+int Relay = D10;
  
 void setup()
 {

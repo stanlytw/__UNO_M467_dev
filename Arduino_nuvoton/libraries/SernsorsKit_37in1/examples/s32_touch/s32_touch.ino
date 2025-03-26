@@ -24,8 +24,8 @@
 
 // constants won't change. They're used here to 
 // set pin numbers:
-const int touchSensorOutputnPin = 10;     // the number of the touch sensor pin
-const int ledPin =  13;      // the number of the LED pin
+const int touchSensorOutputnPin = D10;     // the number of the touch sensor pin
+const int ledPin =  D8;      // the number of the LED pin
 
 // variables will change:
 int touchState = 0;         // variable for reading the touch sensor status

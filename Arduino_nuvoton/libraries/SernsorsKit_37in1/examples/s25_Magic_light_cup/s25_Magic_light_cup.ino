@@ -1,7 +1,7 @@
-int LedPinA = 5;
-int LedPinB = 4;
-int mercurySwitchPinA = 12;
-int mercurySwitchPinB = 11;
+const int LedPinA = D14;
+const int LedPinB = D8;
+const int mercurySwitchPinA = D2;
+const int mercurySwitchPinB = D10;
 int mercurySwitchStateA = 0;
 int mercurySwitchStateB = 0;
 int brightness   = 0;

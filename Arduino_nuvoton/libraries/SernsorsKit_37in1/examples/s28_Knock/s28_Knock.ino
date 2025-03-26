@@ -1,5 +1,5 @@
-int Led=13;
-int Knock=10;
+int Led=D8;
+int Knock=D10;
 int val;
 void setup()
 {

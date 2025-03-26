@@ -1,5 +1,5 @@
-int Led=13;
-int SensorOutputPin=3;
+int Led=D7;
+int SensorOutputPin=D2;
 int val;
 void setup()
 {

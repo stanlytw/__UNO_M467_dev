@@ -8,7 +8,7 @@
 
 #include <nvtIRremote.h>
 
-int RECV_PIN = 9;
+int RECV_PIN = D10;
 
 int LED1 = 2;
 int LED2 = 3;
