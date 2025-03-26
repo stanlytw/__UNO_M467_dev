@@ -223,8 +223,11 @@ void IRsend::sendJVC(unsigned long data, int nbits, int repeat)
 void IRsend::mark(int time) {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
-	PWM_Config(PWM_Desc[BoardToPinInfo[PWM_PIN].num]);	
-	PWM_EnableOutput(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Enable PWM output
+	PWM_Config(PWM_Desc[BoardToPinInfo[PWM_PIN].num]);
+  if(PWM_Desc[BoardToPinInfo[PWM_PIN].num].moduletype == PWM_USE_EPWM)
+    EPWM_EnableOutput(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Enable PWM output
+  else
+    BPWM_EnableOutput((BPWM_T*)PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch));
   //delayMicroseconds(time);
   custom_delay_usec(time);
 }
@@ -235,9 +238,13 @@ void IRsend::space(int time) {
   // A space is no output, so the PWM output is disabled.
 
 	GPIO_Config(GPIO_Desc[PWM_Desc[BoardToPinInfo[PWM_PIN].num].pintype.num]);
-	digitalWrite(PWM_PIN, LOW);	 	
- 	PWM_DisableOutput(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Disable PWM output
- 	//delayMicroseconds(time);
+	digitalWrite(PWM_PIN, LOW);
+  if(PWM_Desc[BoardToPinInfo[PWM_PIN].num].moduletype == PWM_USE_EPWM)	 	
+ 	   EPWM_DisableOutput(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Disable PWM output
+ 	else
+     BPWM_DisableOutput((BPWM_T*)(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P),(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch));
+   ;
+  //delayMicroseconds(time);
  	custom_delay_usec(time);
 }
 
@@ -258,8 +265,17 @@ void IRsend::enableIROut(int khz) {
 	pinMode(PWM_PIN, OUTPUT);	
 	digitalWrite(PWM_PIN, LOW); // When not sending PWM, we want it low	
 	PWM_Config(PWM_Desc[BoardToPinInfo[PWM_PIN].num]);
-	PWM_ConfigOutputChannel(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch,freq,PWM_DUTY);		
-	PWM_Start(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Start PWM
+  if(PWM_Desc[BoardToPinInfo[PWM_PIN].num].moduletype == PWM_USE_EPWM)	 	
+  {
+	   EPWM_ConfigOutputChannel(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch,freq,PWM_DUTY);		
+	   EPWM_Start(PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Start PWM
+  }
+  else
+  {
+     BPWM_ConfigOutputChannel((BPWM_T*)PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch,freq,PWM_DUTY);		
+	   BPWM_Start((BPWM_T*)PWM_Desc[BoardToPinInfo[PWM_PIN].num].P,(1<<PWM_Desc[BoardToPinInfo[PWM_PIN].num].ch)); //Start PWM
+  }
+  
 }
 IRrecv::IRrecv(int recvpin)
 {

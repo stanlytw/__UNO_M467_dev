@@ -120,7 +120,7 @@
 #define IO_REG_TYPE uint32_t
 #define IO_REG_ASM
 #define DIRECT_READ(base, mask)         ( (*(base+0x4) & mask )? 1 : 0 )
-#if defined(__M451__) || defined(__M252__)
+#if defined(__M451__) || defined(__M252__)|| defined(__M460__)
 #define DIRECT_MODE_INPUT(base, mask)  	(GPIO_SetMode((GPIO_T *)base,mask,GPIO_MODE_INPUT))
 #define DIRECT_MODE_OUTPUT(base, mask)  (GPIO_SetMode((GPIO_T *)base,mask,GPIO_MODE_OUTPUT))
 #elif defined(__NUC240__) | defined(__NANO100__) | defined(__NUC131__)

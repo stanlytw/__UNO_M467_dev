@@ -83,6 +83,7 @@ void Enable_All_IPs(void)
     CLK_SetModuleClock(CANFD0_MODULE, CLK_CLKSEL0_CANFD0SEL_HCLK, CLK_CLKDIV5_CANFD0(1));
     /* Enable CAN FD0 peripheral clock */
     CLK_EnableModuleClock(CANFD0_MODULE);
+	/* CANFD_Config is done in nvtCAN library .begin method*/
     
 
     /* SD0 Pin define for M467SJ */
