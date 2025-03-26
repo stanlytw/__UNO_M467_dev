@@ -18,6 +18,11 @@
 
 //Macro
 #define DEF_CARD_DETECT_SOURCE       CardDetect_From_GPIO
+#if defined(__M467SJHAN__)
+#define TARGET_SDH SDH1
+#else//HJ
+#define TARGET_SDH SDH0
+#endif
 
 //Struct Definition
 typedef struct
@@ -40,7 +45,7 @@ int SDGlue_Open_Disk(SDH_T *sdh, uint32_t u32CardDetSrc);
 void SDGlue_Close_Disk(SDH_T *sdh);
 int8_t SDGlue_Get_CardInfo(_SD_CardInfo * psdCardInfo);
 void SDH0_IRQHandler(void);//[2024-11-20]
-
+void SDH1_IRQHandler(void);//[2025-03-05]
 
 #ifdef __cplusplus
 }

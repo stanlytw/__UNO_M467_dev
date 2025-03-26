@@ -46,7 +46,7 @@ Sd2Card::Sd2Card()
 {
   sd_Init = 0;
   sdh_id = 0;
-  sdh_handler = SDH0;//Assign to SDH0
+  sdh_handler = TARGET_SDH;//Assign to SDH0
 }
 
 bool Sd2Card::init(uint32_t detect, uint32_t level)
@@ -54,7 +54,7 @@ bool Sd2Card::init(uint32_t detect, uint32_t level)
   /* Pin Assignment if required*/
   
   //Check if handler is Null;
-  if(sdh_handler!=SDH0) 
+  if(sdh_handler!=TARGET_SDH) 
       return false;
   /* Detect Card Status, Inserted or not*/
   /* Init the Card and Get Card Information*/
@@ -90,7 +90,7 @@ bool Sd2Card::init(uint32_t detect, uint32_t level)
 
 bool Sd2Card::deinit(void)
 {
-  if(sdh_handler!=SDH0)
+  if(sdh_handler!=TARGET_SDH)
       return false;
   
   SDGlue_Close_Disk(sdh_handler);

@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "NuMicro.h"
-
+//#define NVT_DBG_MSG
 static size_t _Trace(const char *s)
 {
     int i = 0 ;

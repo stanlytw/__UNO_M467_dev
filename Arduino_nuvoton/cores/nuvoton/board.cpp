@@ -70,9 +70,13 @@ void Enable_All_IPs(void)
     /* Enable SDH0 module clock source as HCLK and SDH0 module clock divider as 4 */
     //[2024-11-06]Since no wrap for sdh, enable ip clock here.
 	//[2025-03-25]Change to SD1
+#if defined(__M467SJHAN__)    
     CLK_EnableModuleClock(SDH1_MODULE);
     CLK_SetModuleClock(SDH1_MODULE, CLK_CLKSEL0_SDH1SEL_HCLK, CLK_CLKDIV3_SDH1(4));
-	
+#else
+    CLK_EnableModuleClock(SDH0_MODULE);
+    CLK_SetModuleClock(SDH0_MODULE, CLK_CLKSEL0_SDH0SEL_HCLK, CLK_CLKDIV0_SDH0(4));
+#endif	
 	
 	/* Enable CANFD module clock source and proper divide by 1, ref Std sample code */
 	/* CANFD Pin Configuarion left in NVT CAN library*/
@@ -89,7 +93,7 @@ void Enable_All_IPs(void)
     /* SD0 Pin define for M467SJ */
 #if defined(__M467SJHAN__)
     /*M467SJ:*/
-	//SET_SD1_nCD_PB12();
+	//SET_SD1_nCD_PA6();
     SET_SD1_CLK_PA4();
     SET_SD1_CMD_PA5();
     SET_SD1_DAT0_PA8();

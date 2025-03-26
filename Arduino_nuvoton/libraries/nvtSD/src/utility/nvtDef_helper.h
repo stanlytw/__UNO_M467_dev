@@ -12,7 +12,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+//#define NVT_DBG_MSG
 size_t nvtDbg_printf(const char *format, ...);
 
 #ifdef __cplusplus

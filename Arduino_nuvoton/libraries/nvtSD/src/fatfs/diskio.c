@@ -232,20 +232,39 @@ DRESULT disk_ioctl (
 {
 
     DRESULT res = RES_OK;
-
-    switch(cmd)
+    if (pdrv == 0)
     {
-    case CTRL_SYNC:
-        break;
-    case GET_SECTOR_COUNT:
-        *(DWORD*)buff = SD0.totalSectorN;
-        break;
-    case GET_SECTOR_SIZE:
-        *(WORD*)buff = SD0.sectorSize;
-        break;
-    default:
-        res = RES_PARERR;
-        break;
+        switch(cmd)
+        {
+        case CTRL_SYNC:
+            break;
+        case GET_SECTOR_COUNT:
+            *(DWORD*)buff = SD0.totalSectorN;
+            break;
+        case GET_SECTOR_SIZE:
+            *(WORD*)buff = SD0.sectorSize;
+            break;
+        default:
+            res = RES_PARERR;
+            break;
+        }
+    }
+    else if (pdrv == 1)
+    {
+        switch(cmd)
+        {
+        case CTRL_SYNC:
+            break;
+        case GET_SECTOR_COUNT:
+            *(DWORD*)buff = SD1.totalSectorN;
+            break;
+        case GET_SECTOR_SIZE:
+            *(WORD*)buff = SD1.sectorSize;
+            break;
+        default:
+            res = RES_PARERR;
+            break;
+        }
     }
     return res;
 }
