@@ -284,6 +284,66 @@ byte nvtCAN_m460::begin(uint32_t speedset) {
 	return res;
 }
 
+/*********************************************************************************************************
+** Function name:           beginCANIntLBKMode
+** Descriptions:            init can and set speed
+*********************************************************************************************************/
+byte nvtCAN_m460::beginCANIntLBKMode(uint32_t speedset){
+    
+    uint32_t nvtspeed;
+    byte speedtype;
+	byte res;
+	/* Set CANFD Pin MFP. Currently CANFD0 only */
+    CANFD_0_Init();
+	
+	//[2025-03-20]To combine CAN/CAN-FD setting within one begin function. MCP2515/2518 compatible
+    /*
+	    speedtype=1, means CAN-FD speed(normal+data);
+		speedtype=0, means CAN    speed(normal);
+	*/
+	speedtype = BaudRateParser(speedset);
+	
+    //Check if mode vs speed settings are coincident
+	if(speedtype == 1)//CAN-FD
+	{
+		return -1;	
+	}
+	else//CAN
+	{
+		if( _canmode != CANFD_OP_CAN_MODE)
+		{
+		    return -2;	
+		}
+        else
+        {
+			res = CANFD_0_SetConfig(CANFD_OP_CAN_MODE, _normalspeed_set, 0);
+				
+	        //[2025-03-31]Test CAN_FD Internal loopback mode
+	        CANFD0->CCCR |= CANFD_CCCR_MON_Msk;
+	        CANFD0->CCCR |= CANFD_CCCR_TEST_Msk;
+	        CANFD0->TEST |= CANFD_TEST_LBCK_Msk;
+		}		
+	}
+	
+	//[2025-03-21] CAN TX configuration
+	/*
+	    On the fly
+	*/
+	
+	
+	
+	//[2025-03-21] CAN RX configuration
+    /*
+	    Default: Keep all so that some msg can be get without setting SID/XID fileter
+	*/	
+	ncan_configGFC(gfcconfig);
+		
+	//Sync CCCR[0]
+	ncan_syncInit();
+	//[2025-03-18] todo 
+    //res = ncan_enableInterrupt();
+	return res;
+}
 
 /*********************************************************************************************************
 ** Function name:           ncan_configGFC

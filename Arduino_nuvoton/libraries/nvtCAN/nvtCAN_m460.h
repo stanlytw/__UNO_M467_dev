@@ -54,7 +54,8 @@ public:
 public:
     /*CAN operator function*/
     byte begin(uint32_t speedset);
-    byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode);  
+    byte begin(uint32_t normalspeed, uint32_t dataspeed, uint32_t opmode); 
+    byte beginCANIntLBKMode(uint32_t speedset);
 
 	byte setMode(uint32_t opmode);
 	byte getMode(void)              { return _canmode;        }
