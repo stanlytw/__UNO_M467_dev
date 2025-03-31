@@ -19,7 +19,7 @@
                   "size": "33428419",
                   "boards": [
                     {"name": "NuMaker-M467HJ"},
-                    {"name": "NuMaker-M467SJ_SD"}
+                    {"name": "NuMaker-M467SJ_SD"},
 					{"name": "NuMaker-M467SJ_CAN"}
 					
                     						
