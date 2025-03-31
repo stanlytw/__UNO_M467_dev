@@ -107,7 +107,11 @@ class SdFatFs {
 
   private:
     FATFS  _FatfsVolSd0;
-    TCHAR  _Path[3] = {'0',':',0 };
+#if defined(__USESDH1__)  //For SDH1
+    TCHAR  _Path[3] = {'1',':',0 };
+#else
+    TCHAR  _Path[3] = {'0',':',0 };//For SDH0
+#endif    
     //FATFS _SDFatFs;  /* File system object for SD disk logical drive */
     //char _SDPath[4]; /* SD disk logical drive path */
 };

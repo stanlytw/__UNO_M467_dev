@@ -41,7 +41,11 @@ bool SdFatFs::init(void)
 {
 
   /* Mount/register the file system object to the FatFs module */
+#if defined(__USESDH1__)  //For SDH1  
+  _Path[0] = '1';
+#else
   _Path[0] = '0';
+#endif  
   _Path[1] = ':';
   _Path[2] =  0;
   if(f_mount(&_FatfsVolSd0, _Path, 1)== FR_OK)

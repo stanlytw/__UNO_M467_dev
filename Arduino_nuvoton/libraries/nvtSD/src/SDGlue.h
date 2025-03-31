@@ -17,11 +17,12 @@
 #include "./fatfs/ff.h" 
 
 //Macro
-#define DEF_CARD_DETECT_SOURCE       CardDetect_From_GPIO
 #if defined(__M467SJHAN__)
 #define TARGET_SDH SDH1
+#define DEF_CARD_DETECT_SOURCE       CardDetect_From_DAT3
 #else//HJ
 #define TARGET_SDH SDH0
+#define DEF_CARD_DETECT_SOURCE       CardDetect_From_GPIO
 #endif
 
 //Struct Definition

@@ -52,7 +52,12 @@ Sd2Card::Sd2Card()
 bool Sd2Card::init(uint32_t detect, uint32_t level)
 {
   /* Pin Assignment if required*/
-  
+#if defined(__USESDH1__)  //For SDH1  
+  TCHAR       sd_path[] = { '1', ':', 0 };    /* SD drive started from 1 */
+#else//
+  TCHAR       sd_path[] = { '0', ':', 0 };    /* SD drive started from 0 */
+#endif
+
   //Check if handler is Null;
   if(sdh_handler!=TARGET_SDH) 
       return false;
@@ -64,6 +69,8 @@ bool Sd2Card::init(uint32_t detect, uint32_t level)
       nvtDbg_printf("No card!!\n");
       //continue;
   }
+  
+  f_chdrive(sd_path);          /* set default path */
 
   if (!sd_Init)
   {
