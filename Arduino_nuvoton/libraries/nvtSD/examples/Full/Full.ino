@@ -64,9 +64,9 @@ result_t aResult[] = {
   { .tst = "  Reading 'ARDUINO/SD/WRITE.txt' file: ", .err = NULL, .res = false },
   { .tst = "End SD access...", .err = NULL, .res = false },
 };
-
+uint32_t idx = 0;
 void setup() {
-  uint32_t idx = 0;
+  
 
   Serial.begin(9600);
   while (!Serial)
@@ -77,7 +77,17 @@ void setup() {
     delay(10);
   }
   delay(100);
+  
+  delay(1000);
+  
+  Serial.print("Full Example...");
+  
 
+  
+}
+
+void loop() {
+  // do nothing
   /* Test mkdir() method */
   aResult[idx++].res = SD.mkdir("STM32");
   aResult[idx++].res = SD.mkdir("ARDUINO");
@@ -262,8 +272,5 @@ void setup() {
   }
 
   Serial.println("###### End of the SD tests ######");
-}
-
-void loop() {
-  // do nothing
+  while(1);
 }

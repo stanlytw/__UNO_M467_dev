@@ -57,6 +57,10 @@ void setup() {
     Serial.println("Failed to properly end the SD.");
   }
   Serial.println("End of the SD listfiles");
+  
+  delay(1000);
+
+  Serial.print("listfiles Example...");
 }
 
   

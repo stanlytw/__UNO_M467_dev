@@ -40,7 +40,14 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
+  delay(1000);
 
+  Serial.print("DumpInfo Example...");
+  
+}
+
+void loop() {
+	
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open("datalog.txt");
@@ -56,8 +63,7 @@ void setup() {
   else {
     Serial.println("error opening datalog.txt");
   }
-}
-
-void loop() {
+  
+  while(1);
 }
 

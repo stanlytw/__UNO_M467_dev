@@ -86,11 +86,21 @@ void setup() {
   Serial.println();
 
   Serial.println("\nFiles found on the card (name, date and size in bytes): ");
+  
+  delay(1000);
 
+  Serial.print("CardInfo Example...");
+
+}
+
+void loop(void) {
+ 
   File root = SD.openRoot();
+  delay(1000);
 
   // list all files in the card with date and size
   root.ls(LS_R | LS_DATE | LS_SIZE);
+  
   root.close();
   if (!fatFs.deinit()) {
     Serial.println("Failed to deinit card");
@@ -100,10 +110,6 @@ void setup() {
   }
 
   Serial.println("###### End of the SD tests ######");
-
-
-}
-
-void loop(void) {
-  // do nothing
+  
+  while(1);
 }

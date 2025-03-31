@@ -43,6 +43,9 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
+  delay(1000);
+
+  Serial.print("Datalogger Example...");
 }
 
 void loop() {

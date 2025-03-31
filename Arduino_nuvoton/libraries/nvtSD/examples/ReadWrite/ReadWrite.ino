@@ -38,7 +38,16 @@ void setup() {
     while (1);
   }
   Serial.println("initialization done.");
+  
+  delay(1000);
 
+  Serial.print("ReadWrite Example...");
+
+ 
+}
+
+void loop() {
+  
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   myFile = SD.open("test.txt", FILE_WRITE);
@@ -70,10 +79,8 @@ void setup() {
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
   }
-}
-
-void loop() {
-  // nothing happens after setup
+  
+  while(1);
 }
 
 

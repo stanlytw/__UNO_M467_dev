@@ -36,7 +36,16 @@ void setup() {
     while (1);
   }
   Serial.println("initialization done.");
+  
+  delay(1000);
 
+  Serial.print("Files Example...");
+
+  
+}
+
+void loop() {
+  // nothing happens after setup finishes.
   if (SD.exists("example.txt")) {
     Serial.println("example.txt exists.");
   } else {
@@ -64,10 +73,8 @@ void setup() {
   } else {
     Serial.println("example.txt doesn't exist.");
   }
-}
-
-void loop() {
-  // nothing happens after setup finishes.
+  
+  while(1);
 }
 
 
