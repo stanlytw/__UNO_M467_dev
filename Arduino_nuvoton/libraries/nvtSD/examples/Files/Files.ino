@@ -17,7 +17,7 @@
   This example code is in the public domain.
 
 */
-#include <STM32SD.h>
+#include <NVTSD.h>
 
 File myFile;
 

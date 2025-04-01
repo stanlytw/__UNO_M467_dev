@@ -20,7 +20,7 @@
 
 */
 
-#include <STM32SD.h>
+#include <NVTSD.h>
 #define   DATALOG_SAMPLES     12
 #define   FILE_WRITE_APP      (FA_WRITE|FA_OPEN_APPEND)
 

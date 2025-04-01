@@ -14,7 +14,7 @@
 
  This library provides four key benefits:
 
-   * Including `STM32SD.h` automatically creates a global
+   * Including `NVTSD.h` automatically creates a global
      `SD` object which can be interacted with in a similar
      manner to other standard global objects like `Serial` and `Ethernet`.
 
@@ -51,10 +51,9 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
-//#include "stm32_def.h"
 #include "Numicro.h"
 }
-#include "STM32SD.h"
+#include "NVTSD.h"
 #include "SdFatFs.h"
 #include "./utility/nvtDef_helper.h"
 SDClass SD;
@@ -567,7 +566,7 @@ bool File::isDirectory()
 #else
   else if (_fil->fs != 0)
 #endif
-    //return false;//[2024-12-16]for debug. run STM32SD package
+    //return false;//[2024-12-16]for debug. run SD package
     // if not init get info
   if (f_stat(_name, &fno) == FR_OK) {
     if (fno.fattrib & AM_DIR) {
