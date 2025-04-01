@@ -9,12 +9,17 @@ This repository contains the package descriptor for NuMaker UNO boards
 
 # Supported Boards & Features
 
-| NuMaker Boards | Rich peripherals |Embedded CAN<br>nvtCAN(*Note)  |
-| -------------- | ---------------- | ----------------------------------------------- |
-| **[NuMaker-UNO-M467](https://direct.nuvoton.com/en/numaker-m467hj)**       | ✔️              | ❌                                               |
-| **[NuMaker-M467HJ](https://direct.nuvoton.com/en/numaker-m467hj)**         | ✔️              | ❌                                               |                                |
+| NuMaker Boards | Rich GPIO | Embedded SD |Embedded CAN/FD<br>nvtCAN(*Note1)  | RS485 | Ethernet | Firmware Upload<br>by ISP(*Note2) |
+| -------------- | ---------------- | ------|----------------------------------------------- |------|----|----|
+| **[NuMaker-IOT-M467](https://direct.nuvoton.com/en/numaker-iot-m467)**       | ✔️  | ✔️| ✔️| ✔️| ✔️ | ✔️                                            ||
+| NuMaker-M467SJ_SD<br>(*Note3)       |✔️              | ✔️                              | ❌  | ✔️| ✔️| ✔️| ✔️                               ||
+| NuMaker-M467SJ_CAN<br>(*Note3)      |✔️              | ❌                              | ✔️  | ✔️| ✔️| ✔️ | ✔️                               ||
 
-Note: Compatible to [Seeed_Arduino_CAN](https://github.com/Seeed-Studio/Seeed_Arduino_CAN)
+Note1: Compatible to [Seeed_Arduino_CAN](https://github.com/Seeed-Studio/Seeed_Arduino_CAN)
+
+Note2: Require dedicated loader and application code.
+
+Note3: It would be commercial available soon.
 
 # Board Package Installation Steps
 1. Download and Install Arduino IDE from https://www.arduino.cc/en/Main/Software
