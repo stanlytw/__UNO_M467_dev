@@ -9,7 +9,7 @@
 
  */
 // include the SD library:
-#include <NTVSD.h>
+#include <NVTSD.h>
 
 //Call 'card.init()' without parameter.
 //Skip SD_DETECT_PIN and ignore it. 
