@@ -25,6 +25,8 @@ uint8_t volatile g_u8UsbDataReady = 0;
 __attribute__((aligned(4))) uint8_t g_u8UsbRcvBuff[64];
 
 /***************************************************************/
+#define USBDCONNECT_DETECT_RETRYCNT_MAX   (100)
+
 #define HID_CMD_SIGNATURE   0x43444948
 
 /* HID Transfer Commands */
@@ -743,6 +745,8 @@ void VcomBegin(uint32_t baud)
     //SYS_UnlockReg();//For ISP, it is unlock status now
 
 #if defined(__M460__)
+    uint32_t volatile retry_cnt;
+
     uint32_t volatile i;
     /* Select HSUSBD */
     SYS->USBPHY &= ~SYS_USBPHY_HSUSBROLE_Msk;
@@ -761,14 +765,7 @@ void VcomBegin(uint32_t baud)
     HSUSBD_Open(&gsHSInfo, VCOM_ClassRequest, NULL);
 
     /* Start transaction */
-    HSUSBD->OPER = HSUSBD_OPER_HISPDEN_Msk;   /* high-speed */
-    HSUSBD_CLR_SE0();
-
-    VHID_Init();
-    /* Enable HSUSBD interrupt */
-    NVIC_EnableIRQ(USBD20_IRQn);
-
-    /* Start transaction */
+    retry_cnt = 0;
     while(1)
     {
         if(HSUSBD_IS_ATTACHED())
@@ -776,7 +773,20 @@ void VcomBegin(uint32_t baud)
             HSUSBD_Start();
             break;
         }
+        retry_cnt++;
+        if(retry_cnt > USBDCONNECT_DETECT_RETRYCNT_MAX)
+        {
+            /*
+                todo: HSUSBD_Close
+            */
+            return;
+        }
+            
     }
+
+    VHID_Init();
+    /* Enable HSUSBD interrupt */
+    NVIC_EnableIRQ(USBD20_IRQn);
 
      /* Set Vector Table Offset Register */
     SCB->VTOR = FMC_APROM_BASE;        
@@ -813,7 +823,7 @@ void VcomBegin(uint32_t baud)
     {
 	    //Do nothing
 	}
-   
+ 
 }
 
 uint32_t VcomGetTxFifoCount(void)
