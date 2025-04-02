@@ -209,7 +209,9 @@ void HardwareSerial::begin(uint32_t baud)
        {
            if( vcom_init_done == 0 ) 
            {
+#if defined(__M460MINIMA__)           
                 VcomBegin(baud);
+#endif                
                 vcom_init_done = 1;//
            }
        }
@@ -309,11 +311,12 @@ int HardwareSerial::read(void)
     {
         unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
         _rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % SERIAL_BUFFER_SIZE;
+#if defined(__M460MINIMA__)  
         if(u32ModuleNum == UART_USE_VCOM)
         {
             gu32RxCount--;
 	    }
-		
+#endif		
 		return c;
     }
 }
@@ -327,7 +330,11 @@ int HardwareSerial::availableForWrite(void)
 		/*
             To do VCOM availability
         */
-        return ((int)(EPA_MAX_PKT_SIZE) - (int)(vcom_device->EP[EPA].EPDATCNT & 0xffff));
+#if defined(__M460MINIMA__)          
+        return ((int)(EPA_MAXPKT_SIZE) - (int)(vcom_device->EP[EPA].EPDATCNT & 0xffff));
+#else
+        return 0;
+#endif        
 	}
     else if(u32ModuleNum == UART_USE_NOUSE)
 	{
@@ -360,7 +367,11 @@ int HardwareSerial::available(void)
 {
     if(u32ModuleNum == UART_USE_VCOM)
     {
+#if defined(__M460MINIMA__)         
 		return (int)(gu32RxCount);
+#else
+        return 0;
+#endif        
 	}
     else if(u32ModuleNum == UART_USE_NOUSE)
 	{
@@ -378,11 +389,13 @@ size_t HardwareSerial::write(const uint8_t ch)
 #if defined(__M460__)
 	if(u32ModuleNum == UART_USE_VCOM)
     {
+#if defined(__M460MINIMA__) 
 		/*To do:VCOM Tx, single byte TX*/
         vcom_device->EP[EPA].EPDAT_BYTE = ch;
         vcom_device->EP[EPA].EPRSPCTL = HSUSBD_EP_RSPCTL_SHORTTXEN;    // packet end
         vcom_device->EP[EPA].EPTXCNT = 1;
         HSUSBD_ENABLE_EP_INT(EPA, HSUSBD_EPINTEN_INTKIEN_Msk);
+#endif        
 	}
     else if(u32ModuleNum == UART_USE_NOUSE)
 	{
