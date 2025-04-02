@@ -331,7 +331,7 @@ int HardwareSerial::availableForWrite(void)
             To do VCOM availability
         */
 #if defined(__M460MINIMA__)          
-        return ((int)(EPA_MAXPKT_SIZE) - (int)(vcom_device->EP[EPA].EPDATCNT & 0xffff));
+        return ((int)(EPA_MAX_PKT_SIZE) - (int)(vcom_device->EP[EPA].EPDATCNT & 0xffff));
 #else
         return 0;
 #endif        
